@@ -86,10 +86,16 @@ function getAllCharacters(records) {
 }
 
 function getPopularTags(records, limit = 8) {
-  const counts = records.reduce((accumulator, record) => {
-    record.tags.forEach((tag) => {
-      accumulator[tag] = (accumulator[tag] || 0) + 1;
-    });
+  return getPopularValues(records.flatMap((record) => record.tags), limit);
+}
+
+function getPopularCircles(records, limit = 8) {
+  return getPopularValues(records.map((record) => record.circle), limit);
+}
+
+function getPopularValues(values, limit = 8) {
+  const counts = values.reduce((accumulator, value) => {
+    accumulator[value] = (accumulator[value] || 0) + 1;
     return accumulator;
   }, {});
 
@@ -97,6 +103,29 @@ function getPopularTags(records, limit = 8) {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, limit)
     .map(([name, count]) => ({ name, count }));
+}
+
+function getLatestRecord(records) {
+  return sortRecords(records, "newest")[0];
+}
+
+function getRelatedRecords(records, currentRecord, limit = 6) {
+  return records
+    .filter((record) => record.id !== currentRecord.id)
+    .map((record) => {
+      const sharedTags = record.tags.filter((tag) => currentRecord.tags.includes(tag)).length;
+      const sharedCharacters = record.characters.filter((character) => currentRecord.characters.includes(character)).length;
+      const sharedCircle = record.circle === currentRecord.circle ? 1 : 0;
+
+      return {
+        record,
+        weight: sharedTags * 3 + sharedCharacters * 4 + sharedCircle * 5
+      };
+    })
+    .filter((item) => item.weight > 0)
+    .sort((a, b) => b.weight - a.weight || b.record.score - a.record.score)
+    .slice(0, limit)
+    .map((item) => item.record);
 }
 
 function sortRecords(records, sortBy) {
@@ -212,6 +241,11 @@ function renderTagLinks(tags) {
 }
 
 function renderRecordCard(record, variant = "database") {
+  const thumbnail = record.thumbnail || {
+    label: record.id,
+    accent: "#7C5CFF",
+    background: "#111115"
+  };
   const detailMarkup = variant === "database"
     ? `
       <dl class="record-details">
@@ -224,13 +258,15 @@ function renderRecordCard(record, variant = "database") {
 
   return `
     <article class="record-card ${variant === "database" ? "database-card" : ""}">
-      <a class="record-poster record-link" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}">
-        <span class="record-code">${escapeHtml(record.id)}</span>
+      <a class="record-poster record-link" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
+        <span class="record-code">${escapeHtml(thumbnail.label || record.id)}</span>
+        <span class="record-thumb-title">${escapeHtml(record.medium)}</span>
         <span class="record-score" aria-label="AHE SCORE ${escapeHtml(record.score)}">${escapeHtml(record.score)}</span>
       </a>
       <div class="record-body">
         <p class="record-meta">${escapeHtml(record.medium)} / ${escapeHtml(record.year)}</p>
         <h3><a href="work.html?id=${encodeParam(record.id)}">${escapeHtml(record.title)}</a></h3>
+        <p class="record-circle"><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></p>
         <p class="record-note">${escapeHtml(record.note)}</p>
         ${detailMarkup}
         <div class="entity-links" aria-label="Characters">
@@ -259,6 +295,7 @@ function renderHomePreview(records) {
   const grid = document.querySelector("#record-grid");
   const latestGrid = document.querySelector("#home-latest-grid");
   const popularTags = document.querySelector("#home-popular-tags");
+  const popularCircles = document.querySelector("#home-popular-circles");
   const randomWork = document.querySelector("#home-random-work");
   const searchInput = document.querySelector("#archive-search");
   const clearSearch = document.querySelector("#clear-search");
@@ -268,6 +305,7 @@ function renderHomePreview(records) {
   const tagCount = document.querySelector("#tag-count");
   const circleCount = document.querySelector("#circle-count");
   const characterCount = document.querySelector("#character-count");
+  const latestAddedDate = document.querySelector("#latest-added-date");
   const sortRecordsInput = document.querySelector("#sort-records");
   const homeState = {
     query: "",
@@ -301,9 +339,13 @@ function renderHomePreview(records) {
   entryCount.textContent = records.length;
   circleCount.textContent = getAllCircles(records).length;
   characterCount.textContent = getAllCharacters(records).length;
+  latestAddedDate.textContent = getLatestRecord(records).publishedAt;
   latestGrid.innerHTML = renderRecordGrid(latestRecords);
   popularTags.innerHTML = getPopularTags(records).map((tag) => `
     <a class="tag-button" href="tag.html?name=${encodeParam(tag.name)}">${escapeHtml(tag.name)} <span>${tag.count}</span></a>
+  `).join("");
+  popularCircles.innerHTML = getPopularCircles(records).map((circle) => `
+    <a class="tag-button" href="circle.html?name=${encodeParam(circle.name)}">${escapeHtml(circle.name)} <span>${circle.count}</span></a>
   `).join("");
   randomWork.innerHTML = renderRecordCard(randomRecord, "preview");
   renderHomeTags();
@@ -470,6 +512,7 @@ function renderWorkPage(records) {
   const id = getQueryParam("id");
   const record = records.find((item) => item.id === id);
   const app = document.querySelector("#app");
+  const relatedRecords = record ? getRelatedRecords(records, record) : [];
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -517,6 +560,14 @@ function renderWorkPage(records) {
         <h2 id="tags-title">Tags</h2>
         <div class="record-tags">${renderTagLinks(record.tags)}</div>
       </section>
+
+      <section class="detail-section" aria-labelledby="related-title">
+        <h2 id="related-title">Related Works</h2>
+        <p class="section-note">同じタグ、キャラクター、サークルをもつ作品を自動表示します。</p>
+        <div class="database-grid related-grid">
+          ${renderRecordGrid(relatedRecords)}
+        </div>
+      </section>
     </article>
   `;
 }
@@ -524,6 +575,7 @@ function renderWorkPage(records) {
 function renderListingPage(records, type) {
   const name = getQueryParam("name");
   const app = document.querySelector("#app");
+  databaseState.records = records;
   const titleMap = {
     tag: "Tag",
     circle: "Circle",
@@ -565,7 +617,7 @@ function renderListingPage(records, type) {
       <header class="detail-hero compact">
         <p class="eyebrow">${escapeHtml(titleMap[type])} / ${matchedRecords.length} Records</p>
         <h1 id="listing-title">${escapeHtml(name)}</h1>
-        <p>JSONデータ内の分類値から自動生成された一覧ページです。</p>
+        <p>${matchedRecords.length}件の作品をJSONから自動表示しています。</p>
       </header>
 
       <div class="database-grid">
@@ -581,6 +633,19 @@ function renderIndexPage(type, values) {
     circle: "Circles",
     character: "Characters"
   };
+  const records = databaseState.records || [];
+  const countFor = (value) => records.filter((record) => {
+    if (type === "tag") {
+      return record.tags.includes(value);
+    }
+
+    if (type === "circle") {
+      return record.circle === value;
+    }
+
+    return record.characters.includes(value);
+  }).length;
+  const sortedValues = [...values].sort((a, b) => countFor(b) - countFor(a) || a.localeCompare(b));
 
   return `
     <section class="listing-page" aria-labelledby="index-title">
@@ -589,13 +654,13 @@ function renderIndexPage(type, values) {
       <header class="detail-hero compact">
         <p class="eyebrow">Index</p>
         <h1 id="index-title">${escapeHtml(titleMap[type])}</h1>
-        <p>JSONに登録された分類値の一覧です。</p>
+        <p>JSONに登録された分類値を件数つきの人気順で表示します。</p>
       </header>
       <div class="index-grid">
-        ${values.map((value) => `
+        ${sortedValues.map((value) => `
           <a href="${type}.html?name=${encodeParam(value)}">
             <strong>${escapeHtml(value)}</strong>
-            <span>Open ${escapeHtml(type)} page</span>
+            <span>${countFor(value)} works</span>
           </a>
         `).join("")}
       </div>
@@ -735,6 +800,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const records = await loadRecords();
+    databaseState.records = records;
 
     if (page === "home") {
       renderHomePreview(records);

@@ -18,7 +18,12 @@
     "circle": "Archive Unit 01",
     "characters": [
       "Mio Archive"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0001",
+      "accent": "#7C5CFF",
+      "background": "#111115"
+    }
   },
   {
     "id": "AHE-0002",
@@ -39,7 +44,12 @@
     "circle": "Lens Index",
     "characters": [
       "Rena Lens"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0002",
+      "accent": "#4F8CFF",
+      "background": "#050506"
+    }
   },
   {
     "id": "AHE-0003",
@@ -60,7 +70,12 @@
     "circle": "Web Folklore Lab",
     "characters": [
       "Nika Web"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0003",
+      "accent": "#9D5CFF",
+      "background": "#17121F"
+    }
   },
   {
     "id": "AHE-0004",
@@ -81,7 +96,12 @@
     "circle": "Taxonomy Desk",
     "characters": [
       "Ari Taxon"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0004",
+      "accent": "#5CE1E6",
+      "background": "#101418"
+    }
   },
   {
     "id": "AHE-0005",
@@ -102,7 +122,12 @@
     "circle": "Icon Studio",
     "characters": [
       "Suzu Icon"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0005",
+      "accent": "#FF5CA8",
+      "background": "#14080F"
+    }
   },
   {
     "id": "AHE-0006",
@@ -123,7 +148,12 @@
     "circle": "Panel Metrics",
     "characters": [
       "Koto Panel"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0006",
+      "accent": "#FFD166",
+      "background": "#161207"
+    }
   },
   {
     "id": "AHE-0007",
@@ -144,7 +174,12 @@
     "circle": "Forum Trace",
     "characters": [
       "Yui Forum"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0007",
+      "accent": "#7C5CFF",
+      "background": "#243B55"
+    }
   },
   {
     "id": "AHE-0008",
@@ -165,7 +200,12 @@
     "circle": "Pose Metadata Group",
     "characters": [
       "Lina Pose"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0008",
+      "accent": "#90BE6D",
+      "background": "#0D160F"
+    }
   },
   {
     "id": "AHE-0009",
@@ -187,7 +227,12 @@
     "characters": [
       "Mio Archive",
       "Ari Taxon"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0009",
+      "accent": "#B5179E",
+      "background": "#120615"
+    }
   },
   {
     "id": "AHE-0010",
@@ -208,7 +253,12 @@
     "circle": "Cover Signal",
     "characters": [
       "Noa Cover"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0010",
+      "accent": "#F77F00",
+      "background": "#1B0F03"
+    }
   },
   {
     "id": "AHE-0011",
@@ -229,7 +279,12 @@
     "circle": "Motion Timing Lab",
     "characters": [
       "Ema Motion"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0011",
+      "accent": "#00BBF9",
+      "background": "#06131A"
+    }
   },
   {
     "id": "AHE-0012",
@@ -250,7 +305,12 @@
     "circle": "Minimal Line Works",
     "characters": [
       "Suzu Icon"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0012",
+      "accent": "#E0AAFF",
+      "background": "#191126"
+    }
   },
   {
     "id": "AHE-0013",
@@ -271,7 +331,12 @@
     "circle": "Web Folklore Lab",
     "characters": [
       "Nika Web"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0013",
+      "accent": "#7C5CFF",
+      "background": "#0B132B"
+    }
   },
   {
     "id": "AHE-0014",
@@ -293,7 +358,12 @@
     "characters": [
       "Koto Panel",
       "Rena Lens"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0014",
+      "accent": "#F72585",
+      "background": "#180612"
+    }
   },
   {
     "id": "AHE-0015",
@@ -314,7 +384,12 @@
     "circle": "Interface Room",
     "characters": [
       "Iris UI"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0015",
+      "accent": "#B8F2E6",
+      "background": "#061616"
+    }
   },
   {
     "id": "AHE-0016",
@@ -335,7 +410,12 @@
     "circle": "Score Review Board",
     "characters": [
       "Ari Taxon"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0016",
+      "accent": "#C1121F",
+      "background": "#1A0507"
+    }
   },
   {
     "id": "AHE-0017",
@@ -357,7 +437,12 @@
     "characters": [
       "Suzu Icon",
       "Mio Archive"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0017",
+      "accent": "#80FFDB",
+      "background": "#061A16"
+    }
   },
   {
     "id": "AHE-0018",
@@ -378,7 +463,12 @@
     "circle": "Motion Timing Lab",
     "characters": [
       "Ema Motion"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0018",
+      "accent": "#AACC00",
+      "background": "#111705"
+    }
   },
   {
     "id": "AHE-0019",
@@ -400,7 +490,12 @@
     "characters": [
       "Ari Taxon",
       "Iris UI"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0019",
+      "accent": "#8338EC",
+      "background": "#130A24"
+    }
   },
   {
     "id": "AHE-0020",
@@ -422,6 +517,11 @@
     "characters": [
       "Mio Archive",
       "Iris UI"
-    ]
+    ],
+    "thumbnail": {
+      "label": "#0020",
+      "accent": "#FFBE0B",
+      "background": "#1B1302"
+    }
   }
 ]
