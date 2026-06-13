@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AHE LAB database page with searchable expression archive records, tags, and AHE SCORE sorting.">
+  <title>Database | AHE LAB</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="database-page">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="AHE LAB home">
+      <span class="brand-mark">A</span>
+      <span>
+        <strong>AHE LAB</strong>
+        <small>Expression Archive Institute</small>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="index.html">Home</a>
+      <a href="database.html" aria-current="page">Database</a>
+      <a href="database.html#database-tags">Tags</a>
+      <a href="index.html#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="database-hero" aria-labelledby="database-page-title">
+      <div>
+        <p class="eyebrow">Phase 2 / Database</p>
+        <h1 id="database-page-title">Expression Records</h1>
+        <p>
+          20件のサンプルJSONデータをもとに、検索、タグ分類、AHE SCORE、ソートを
+          すべてブラウザ上で処理する静的データベースです。
+        </p>
+      </div>
+
+      <div class="database-metrics" aria-label="Database metrics">
+        <article>
+          <span id="db-total-count">0</span>
+          <p>Total Records</p>
+        </article>
+        <article>
+          <span id="db-average-score">0</span>
+          <p>Average Score</p>
+        </article>
+        <article>
+          <span id="db-active-filter">All</span>
+          <p>Active Tag</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="database-workspace" aria-labelledby="database-controls-title">
+      <aside class="database-sidebar" id="database-tags">
+        <div class="sidebar-heading">
+          <p class="eyebrow">Tags</p>
+          <h2 id="database-controls-title">Filter</h2>
+        </div>
+        <div class="tag-cloud database-tag-cloud" id="db-tag-cloud" aria-label="Filter records by tag"></div>
+      </aside>
+
+      <section class="database-results" aria-labelledby="database-results-title">
+        <div class="database-control-panel">
+          <div>
+            <p class="eyebrow">Search</p>
+            <h2 id="database-results-title">Archive Browser</h2>
+          </div>
+
+          <form class="search-bar database-search" role="search">
+            <label class="visually-hidden" for="db-search">Search database</label>
+            <input id="db-search" type="search" placeholder="Search title, medium, tag, note..." autocomplete="off">
+            <button type="reset" id="db-clear-search">Clear</button>
+          </form>
+
+          <div class="database-toolbar database-page-toolbar" aria-live="polite">
+            <span id="db-result-count">0 records</span>
+            <label>
+              <span class="visually-hidden">Sort records</span>
+              <select id="db-sort-records" aria-label="Sort records">
+                <option value="newest">新着</option>
+                <option value="score">AHE SCORE</option>
+                <option value="title">タイトル</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="database-grid" id="db-record-grid"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 AHE LAB. Expression Archive Institute.</p>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="https://github.com/ahelab/ahe-lab">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
