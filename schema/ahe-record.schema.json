@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ahe-record.schema.json",
+  "title": "AHE LAB Record Collection",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "id",
+      "title",
+      "medium",
+      "year",
+      "publishedAt",
+      "score",
+      "intensity",
+      "status",
+      "tags",
+      "note",
+      "circle",
+      "characters"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^AHE-[0-9]{4}$"
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1
+      },
+      "medium": {
+        "type": "string",
+        "minLength": 1
+      },
+      "year": {
+        "type": "integer",
+        "minimum": 1900,
+        "maximum": 2100
+      },
+      "publishedAt": {
+        "type": "string",
+        "format": "date"
+      },
+      "score": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "intensity": {
+        "type": "string",
+        "enum": ["Low", "Medium", "High"]
+      },
+      "status": {
+        "type": "string",
+        "enum": ["Draft", "Researching", "Cataloged", "Reviewed"]
+      },
+      "tags": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "note": {
+        "type": "string",
+        "minLength": 1
+      },
+      "circle": {
+        "type": "string",
+        "minLength": 1
+      },
+      "characters": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "thumbnail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "accent", "background"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "accent": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "background": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          }
+        }
+      }
+    }
+  }
+}

@@ -52,6 +52,61 @@ AHE LABはアヘ顔文化を記録します。
 
 Archive First.
 
+---
+
+## 新しい作品の追加方法
+
+AHE LABは `data/ahe-records.json` を唯一の作品データソースとして扱います。
+新しい作品を追加するときは、`template.json` をコピーして必要項目を埋め、
+`data/ahe-records.json` の配列末尾に1件追加してください。
+
+### 必須項目
+
+- `id`: `AHE-0001` 形式の一意なID
+- `title`: 作品タイトル
+- `medium`: 媒体
+- `year`: 年
+- `publishedAt`: `YYYY-MM-DD` 形式の日付
+- `score`: 0から100のAHE SCORE
+- `intensity`: `Low` / `Medium` / `High`
+- `status`: `Draft` / `Researching` / `Cataloged` / `Reviewed`
+- `tags`: 1件以上のタグ配列
+- `note`: 研究メモ
+- `circle`: サークル名
+- `characters`: 1件以上のキャラクター配列
+
+### 任意項目
+
+- `thumbnail`: カード用の表示メタデータ
+  - `label`
+  - `accent`
+  - `background`
+
+### バリデーション
+
+構造の基準は `schema/ahe-record.schema.json` に定義しています。
+追加前に以下を確認してください。
+
+- JSONとして構文エラーがない
+- `id` が重複していない
+- 必須項目がすべて入っている
+- `score` が0から100の整数になっている
+- `publishedAt` が `YYYY-MM-DD` 形式になっている
+
+### 反映されるページ
+
+`data/ahe-records.json` に1件追加すると、以下が自動更新されます。
+
+- Home
+- Database
+- Work
+- Tag
+- Circle
+- Character
+- Ranking
+- Stats
+- Sitemap
+
 ```
 
 ---

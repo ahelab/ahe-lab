@@ -186,6 +186,7 @@ function renderLayout(activePage) {
           <a href="index.html" ${activePage === "home" ? 'aria-current="page"' : ""}>Home</a>
           <a href="database.html" ${activePage === "database" ? 'aria-current="page"' : ""}>Database</a>
           <a href="ranking.html" ${activePage === "ranking" ? 'aria-current="page"' : ""}>Ranking</a>
+          <a href="stats.html" ${activePage === "stats" ? 'aria-current="page"' : ""}>Stats</a>
           <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
           <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
           <a href="character.html" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
@@ -202,7 +203,9 @@ function renderLayout(activePage) {
         <div>
           <a href="database.html">Database</a>
           <a href="ranking.html">Ranking</a>
+          <a href="stats.html">Stats</a>
           <a href="about.html">About</a>
+          <a href="sitemap.html">Sitemap</a>
           <a href="tag.html">Tags</a>
           <a href="circle.html">Circles</a>
           <a href="character.html">Characters</a>
@@ -671,14 +674,14 @@ function renderIndexPage(type, values) {
 function renderRankingPage(records) {
   setMeta(
     "Ranking | AHE LAB",
-    "AHE SCORE, latest records, and tag count rankings generated from the AHE LAB JSON archive.",
+    "AHE SCORE, latest records, and title rankings generated from the AHE LAB JSON archive.",
     "ranking.html"
   );
 
   const app = document.querySelector("#app");
   const byScore = sortRecords(records, "score").slice(0, 10);
   const byNewest = sortRecords(records, "newest").slice(0, 10);
-  const byTags = [...records].sort((a, b) => b.tags.length - a.tags.length || b.score - a.score).slice(0, 10);
+  const byTitle = sortRecords(records, "title").slice(0, 10);
 
   app.innerHTML = `
     <section class="listing-page ranking-page" aria-labelledby="ranking-title">
@@ -687,13 +690,13 @@ function renderRankingPage(records) {
       <header class="detail-hero compact">
         <p class="eyebrow">Ranking</p>
         <h1 id="ranking-title">Archive Ranking</h1>
-        <p>AHE SCORE、新着、タグ数の3軸でJSONデータを自動ランキング化します。</p>
+        <p>AHE SCORE順、新着順、タイトル順の3軸でJSONデータを自動ランキング化します。</p>
       </header>
 
       <div class="ranking-grid">
         ${renderRankingList("AHE SCORE Ranking", byScore, (record) => record.score)}
         ${renderRankingList("Latest Ranking", byNewest, (record) => record.publishedAt)}
-        ${renderRankingList("Tag Count Ranking", byTags, (record) => `${record.tags.length} tags`)}
+        ${renderRankingList("Title Ranking", byTitle, (record) => record.title.slice(0, 1).toUpperCase())}
       </div>
     </section>
   `;
@@ -713,6 +716,112 @@ function renderRankingList(title, records, metric) {
           </li>
         `).join("")}
       </ol>
+    </section>
+  `;
+}
+
+function renderStatsPage(records) {
+  setMeta(
+    "Stats | AHE LAB",
+    "AHE LAB archive totals, average AHE SCORE, and top tag rankings generated from JSON.",
+    "stats.html"
+  );
+
+  const app = document.querySelector("#app");
+  const averageScore = Math.round(records.reduce((sum, record) => sum + record.score, 0) / records.length);
+  const topTags = getPopularTags(records, 12);
+
+  app.innerHTML = `
+    <section class="listing-page stats-page" aria-labelledby="stats-title">
+      ${renderBackButton("index.html", "Back to Home")}
+      ${renderBreadcrumb([{ label: "Stats" }])}
+      <header class="detail-hero compact">
+        <p class="eyebrow">Stats</p>
+        <h1 id="stats-title">Archive Stats</h1>
+        <p>JSONデータから総数、平均AHE SCORE、上位タグランキングを自動集計します。</p>
+      </header>
+
+      <div class="stats-grid">
+        ${renderStatCard("Works", records.length)}
+        ${renderStatCard("Tags", getAllTags(records).length - 1)}
+        ${renderStatCard("Circles", getAllCircles(records).length)}
+        ${renderStatCard("Characters", getAllCharacters(records).length)}
+        ${renderStatCard("Average AHE SCORE", averageScore)}
+      </div>
+
+      <section class="ranking-list stats-tags" aria-labelledby="top-tags-title">
+        <h2 id="top-tags-title">Top Tag Ranking</h2>
+        <ol>
+          ${topTags.map((tag) => `
+            <li>
+              <a href="tag.html?name=${encodeParam(tag.name)}">
+                <strong>${escapeHtml(tag.name)}</strong>
+                <span>${tag.count} works</span>
+              </a>
+            </li>
+          `).join("")}
+        </ol>
+      </section>
+    </section>
+  `;
+}
+
+function renderStatCard(label, value) {
+  return `
+    <article>
+      <span>${escapeHtml(value)}</span>
+      <p>${escapeHtml(label)}</p>
+    </article>
+  `;
+}
+
+function getGeneratedUrls(records) {
+  return [
+    "index.html",
+    "database.html",
+    "ranking.html",
+    "stats.html",
+    "about.html",
+    "tag.html",
+    "circle.html",
+    "character.html",
+    "sitemap.html",
+    "404.html",
+    ...records.map((record) => `work.html?id=${encodeParam(record.id)}`),
+    ...getAllTags(records).filter((tag) => tag !== "all").map((tag) => `tag.html?name=${encodeParam(tag)}`),
+    ...getAllCircles(records).map((circle) => `circle.html?name=${encodeParam(circle)}`),
+    ...getAllCharacters(records).map((character) => `character.html?name=${encodeParam(character)}`)
+  ];
+}
+
+function renderSitemapPage(records) {
+  setMeta(
+    "Sitemap | AHE LAB",
+    "JSON-generated sitemap for AHE LAB database, work, tag, circle, character, ranking, and stats pages.",
+    "sitemap.html"
+  );
+
+  const app = document.querySelector("#app");
+  const urls = getGeneratedUrls(records);
+
+  app.innerHTML = `
+    <section class="listing-page sitemap-page" aria-labelledby="sitemap-title">
+      ${renderBackButton("index.html", "Back to Home")}
+      ${renderBreadcrumb([{ label: "Sitemap" }])}
+      <header class="detail-hero compact">
+        <p class="eyebrow">Sitemap</p>
+        <h1 id="sitemap-title">Generated Sitemap</h1>
+        <p>JSONに1件追加すると、作品・タグ・サークル・キャラクターのリンクが自動更新されます。</p>
+      </header>
+
+      <div class="index-grid sitemap-grid">
+        ${urls.map((url) => `
+          <a href="${url}">
+            <strong>${escapeHtml(url)}</strong>
+            <span>Open page</span>
+          </a>
+        `).join("")}
+      </div>
     </section>
   `;
 }
@@ -814,6 +923,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (page === "ranking") {
       renderRankingPage(records);
+      return;
+    }
+
+    if (page === "stats") {
+      renderStatsPage(records);
+      return;
+    }
+
+    if (page === "sitemap") {
+      renderSitemapPage(records);
       return;
     }
 
