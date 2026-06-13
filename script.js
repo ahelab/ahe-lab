@@ -28,13 +28,32 @@ function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-function setMeta(title, description) {
+function getCurrentRelativeUrl() {
+  return `${window.location.pathname.split("/").pop() || "index.html"}${window.location.search}`;
+}
+
+function setTagAttribute(selector, attribute, value) {
+  const tag = document.querySelector(selector);
+
+  if (tag) {
+    tag.setAttribute(attribute, value);
+  }
+}
+
+function setMeta(title, description, canonical = getCurrentRelativeUrl()) {
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
 
   if (metaDescription) {
     metaDescription.setAttribute("content", description);
   }
+
+  setTagAttribute('meta[property="og:title"]', "content", title);
+  setTagAttribute('meta[property="og:description"]', "content", description);
+  setTagAttribute('meta[property="og:url"]', "content", canonical);
+  setTagAttribute('meta[name="twitter:title"]', "content", title);
+  setTagAttribute('meta[name="twitter:description"]', "content", description);
+  setTagAttribute('link[rel="canonical"]', "href", canonical);
 }
 
 function getRecordSearchText(record) {
@@ -64,6 +83,20 @@ function getAllCircles(records) {
 
 function getAllCharacters(records) {
   return [...new Set(records.flatMap((record) => record.characters))].sort();
+}
+
+function getPopularTags(records, limit = 8) {
+  const counts = records.reduce((accumulator, record) => {
+    record.tags.forEach((tag) => {
+      accumulator[tag] = (accumulator[tag] || 0) + 1;
+    });
+    return accumulator;
+  }, {});
+
+  return Object.entries(counts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, limit)
+    .map(([name, count]) => ({ name, count }));
 }
 
 function sortRecords(records, sortBy) {
@@ -123,10 +156,11 @@ function renderLayout(activePage) {
         <nav class="site-nav" aria-label="Primary navigation">
           <a href="index.html" ${activePage === "home" ? 'aria-current="page"' : ""}>Home</a>
           <a href="database.html" ${activePage === "database" ? 'aria-current="page"' : ""}>Database</a>
-          <a href="tag.html?name=archive-first" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
-          <a href="circle.html?name=Archive%20Unit%2001" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
-          <a href="character.html?name=Mio%20Archive" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
-          <a href="index.html#about">About</a>
+          <a href="ranking.html" ${activePage === "ranking" ? 'aria-current="page"' : ""}>Ranking</a>
+          <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
+          <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
+          <a href="character.html" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
+          <a href="about.html" ${activePage === "about" ? 'aria-current="page"' : ""}>About</a>
         </nav>
       </header>
     `;
@@ -138,6 +172,8 @@ function renderLayout(activePage) {
         <p>© 2026 AHE LAB. Expression Archive Institute.</p>
         <div>
           <a href="database.html">Database</a>
+          <a href="ranking.html">Ranking</a>
+          <a href="about.html">About</a>
           <a href="tag.html">Tags</a>
           <a href="circle.html">Circles</a>
           <a href="character.html">Characters</a>
@@ -145,6 +181,22 @@ function renderLayout(activePage) {
       </footer>
     `;
   }
+}
+
+function renderBreadcrumb(items) {
+  return `
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      ${items.map((item) => item.href
+        ? `<span>/</span><a href="${item.href}">${escapeHtml(item.label)}</a>`
+        : `<span>/</span><strong>${escapeHtml(item.label)}</strong>`
+      ).join("")}
+    </nav>
+  `;
+}
+
+function renderBackButton(href = "database.html", label = "Back") {
+  return `<a class="back-link" href="${href}">← ${escapeHtml(label)}</a>`;
 }
 
 function renderEntityLinks(values, page) {
@@ -202,13 +254,20 @@ function renderRecordGrid(records) {
 
 function renderHomePreview(records) {
   const previewRecords = sortRecords(records, "score").slice(0, 4);
+  const latestRecords = sortRecords(records, "newest").slice(0, 3);
+  const randomRecord = records[Math.floor((new Date().getDate() - 1) % records.length)];
   const grid = document.querySelector("#record-grid");
+  const latestGrid = document.querySelector("#home-latest-grid");
+  const popularTags = document.querySelector("#home-popular-tags");
+  const randomWork = document.querySelector("#home-random-work");
   const searchInput = document.querySelector("#archive-search");
   const clearSearch = document.querySelector("#clear-search");
   const tagCloud = document.querySelector("#tag-cloud");
   const resultCount = document.querySelector("#result-count");
   const entryCount = document.querySelector("#entry-count");
   const tagCount = document.querySelector("#tag-count");
+  const circleCount = document.querySelector("#circle-count");
+  const characterCount = document.querySelector("#character-count");
   const sortRecordsInput = document.querySelector("#sort-records");
   const homeState = {
     query: "",
@@ -240,6 +299,13 @@ function renderHomePreview(records) {
   }
 
   entryCount.textContent = records.length;
+  circleCount.textContent = getAllCircles(records).length;
+  characterCount.textContent = getAllCharacters(records).length;
+  latestGrid.innerHTML = renderRecordGrid(latestRecords);
+  popularTags.innerHTML = getPopularTags(records).map((tag) => `
+    <a class="tag-button" href="tag.html?name=${encodeParam(tag.name)}">${escapeHtml(tag.name)} <span>${tag.count}</span></a>
+  `).join("");
+  randomWork.innerHTML = renderRecordCard(randomRecord, "preview");
   renderHomeTags();
   renderHomeRecords();
 
@@ -284,6 +350,7 @@ function renderDatabasePage(records) {
   app.innerHTML = `
     <section class="database-hero" aria-labelledby="database-page-title">
       <div>
+        ${renderBreadcrumb([{ label: "Database" }])}
         <p class="eyebrow">Phase 3 / JSON Source Database</p>
         <h1 id="database-page-title">Expression Records</h1>
         <p>
@@ -406,7 +473,7 @@ function renderWorkPage(records) {
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
-    app.innerHTML = renderNotFound("Work not found", "Databaseから作品を選択してください。");
+    app.innerHTML = renderNotFound("Work not found", "Databaseから作品を選択してください。", "database.html");
     return;
   }
 
@@ -417,6 +484,8 @@ function renderWorkPage(records) {
 
   app.innerHTML = `
     <article class="detail-page" aria-labelledby="work-title">
+      ${renderBackButton("database.html", "Back to Database")}
+      ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
       <header class="detail-hero">
         <p class="eyebrow">Work Detail / ${escapeHtml(record.id)}</p>
         <h1 id="work-title">${escapeHtml(record.title)}</h1>
@@ -491,6 +560,8 @@ function renderListingPage(records, type) {
 
   app.innerHTML = `
     <section class="listing-page" aria-labelledby="listing-title">
+      ${renderBackButton("database.html", "Back to Database")}
+      ${renderBreadcrumb([{ label: titleMap[type], href: `${type}.html` }, { label: name }])}
       <header class="detail-hero compact">
         <p class="eyebrow">${escapeHtml(titleMap[type])} / ${matchedRecords.length} Records</p>
         <h1 id="listing-title">${escapeHtml(name)}</h1>
@@ -513,6 +584,8 @@ function renderIndexPage(type, values) {
 
   return `
     <section class="listing-page" aria-labelledby="index-title">
+      ${renderBackButton("database.html", "Back to Database")}
+      ${renderBreadcrumb([{ label: titleMap[type] }])}
       <header class="detail-hero compact">
         <p class="eyebrow">Index</p>
         <h1 id="index-title">${escapeHtml(titleMap[type])}</h1>
@@ -530,13 +603,109 @@ function renderIndexPage(type, values) {
   `;
 }
 
-function renderNotFound(title, message) {
+function renderRankingPage(records) {
+  setMeta(
+    "Ranking | AHE LAB",
+    "AHE SCORE, latest records, and tag count rankings generated from the AHE LAB JSON archive.",
+    "ranking.html"
+  );
+
+  const app = document.querySelector("#app");
+  const byScore = sortRecords(records, "score").slice(0, 10);
+  const byNewest = sortRecords(records, "newest").slice(0, 10);
+  const byTags = [...records].sort((a, b) => b.tags.length - a.tags.length || b.score - a.score).slice(0, 10);
+
+  app.innerHTML = `
+    <section class="listing-page ranking-page" aria-labelledby="ranking-title">
+      ${renderBackButton("index.html", "Back to Home")}
+      ${renderBreadcrumb([{ label: "Ranking" }])}
+      <header class="detail-hero compact">
+        <p class="eyebrow">Ranking</p>
+        <h1 id="ranking-title">Archive Ranking</h1>
+        <p>AHE SCORE、新着、タグ数の3軸でJSONデータを自動ランキング化します。</p>
+      </header>
+
+      <div class="ranking-grid">
+        ${renderRankingList("AHE SCORE Ranking", byScore, (record) => record.score)}
+        ${renderRankingList("Latest Ranking", byNewest, (record) => record.publishedAt)}
+        ${renderRankingList("Tag Count Ranking", byTags, (record) => `${record.tags.length} tags`)}
+      </div>
+    </section>
+  `;
+}
+
+function renderRankingList(title, records, metric) {
+  return `
+    <section class="ranking-list" aria-label="${escapeHtml(title)}">
+      <h2>${escapeHtml(title)}</h2>
+      <ol>
+        ${records.map((record) => `
+          <li>
+            <a href="work.html?id=${encodeParam(record.id)}">
+              <strong>${escapeHtml(record.title)}</strong>
+              <span>${escapeHtml(metric(record))}</span>
+            </a>
+          </li>
+        `).join("")}
+      </ol>
+    </section>
+  `;
+}
+
+function renderAboutPage() {
+  setMeta(
+    "About | AHE LAB",
+    "Mission, vision, project roadmap, and contribution notes for AHE LAB.",
+    "about.html"
+  );
+
+  const app = document.querySelector("#app");
+
+  app.innerHTML = `
+    <section class="listing-page about-page" aria-labelledby="about-page-title">
+      ${renderBackButton("index.html", "Back to Home")}
+      ${renderBreadcrumb([{ label: "About" }])}
+      <header class="detail-hero compact">
+        <p class="eyebrow">About</p>
+        <h1 id="about-page-title">Expression Archive Institute</h1>
+        <p>AHE LABは、表現文化を記録・分類・検索可能にする静的データベースプロジェクトです。</p>
+      </header>
+
+      <div class="about-grid expanded">
+        <article><h2>Mission</h2><p>アヘ顔文化を文化資料として記録し、検索可能なアーカイブとして未来に残します。</p></article>
+        <article><h2>Vision</h2><p>IMDbのような一覧性と、研究機関のような分類精度を両立する公開データベースを目指します。</p></article>
+        <article><h2>Project</h2><p>HTML、CSS、Vanilla JavaScript、JSONだけで、GitHub Pages上に維持しやすい静的サイトを構築します。</p></article>
+        <article><h2>Roadmap</h2><p>MVP、Database、JSON駆動ページ、公開品質改善、データ拡充、検索精度改善の順に進めます。</p></article>
+        <article><h2>Contribute</h2><p>新規レコードはJSONへ1件追加するだけで、Database、詳細、タグ、サークル、キャラクターへ反映されます。</p></article>
+        <article><h2>GitHub</h2><p>相対パス制約を維持するため、公開サイト内ではリポジトリ情報をREADMEから参照します。</p><a class="text-link" href="README.md">Open README</a></article>
+      </div>
+    </section>
+  `;
+}
+
+function render404Page() {
+  setMeta("404 | AHE LAB", "The requested AHE LAB archive page could not be found.", "404.html");
+  const app = document.querySelector("#app");
+  app.innerHTML = `
+    <section class="listing-page">
+      ${renderBackButton("index.html", "Back to Home")}
+      ${renderBreadcrumb([{ label: "404" }])}
+      <div class="empty-state">
+        <h1>404</h1>
+        <p>ページが見つかりませんでした。</p>
+        <a class="button primary" href="index.html">Back</a>
+      </div>
+    </section>
+  `;
+}
+
+function renderNotFound(title, message, href = "database.html") {
   return `
     <section class="listing-page">
       <div class="empty-state">
         <h1>${escapeHtml(title)}</h1>
         <p>${escapeHtml(message)}</p>
-        <a class="button primary" href="database.html">Back to Database</a>
+        <a class="button primary" href="${href}">Back</a>
       </div>
     </section>
   `;
@@ -554,6 +723,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const page = document.body.dataset.page || "home";
   renderLayout(page);
 
+  if (page === "about") {
+    renderAboutPage();
+    return;
+  }
+
+  if (page === "not-found") {
+    render404Page();
+    return;
+  }
+
   try {
     const records = await loadRecords();
 
@@ -564,6 +743,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (page === "database") {
       renderDatabasePage(records);
+      return;
+    }
+
+    if (page === "ranking") {
+      renderRankingPage(records);
       return;
     }
 
