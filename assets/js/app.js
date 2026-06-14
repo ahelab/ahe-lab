@@ -623,7 +623,6 @@ function renderCommunityReviews(record) {
               <time datetime="${escapeHtml(review.createdAt)}">${escapeHtml(review.createdAt)}</time>
             </header>
             <p class="review-score">AHE Score: ${score === null ? "未評価" : `${escapeHtml(score)}/100`}</p>
-            ${renderReviewRatingList(review)}
             <div class="review-comment">
               <h4>Comment</h4>
               <p>${escapeHtml(review.comment || "No comment recorded.")}</p>
@@ -1058,7 +1057,6 @@ function renderWorkPage(records) {
 
       ${renderScoreSummary(record)}
       ${renderRatingBreakdown(record)}
-      ${renderCategoryAverage(record)}
 
       <section class="detail-section review-cta" aria-labelledby="review-cta-title">
         <h2 id="review-cta-title">Write a Community Review</h2>
