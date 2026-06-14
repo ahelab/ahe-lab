@@ -1232,17 +1232,13 @@ h3 {
   font-weight: 800;
 }
 
-.review-breakdown,
-.category-average-grid,
-.review-rating-list {
+.review-breakdown {
   display: grid;
   gap: 10px;
   margin-top: 16px;
 }
 
-.breakdown-row,
-.category-average-item,
-.review-rating-list div {
+.breakdown-row {
   display: grid;
   grid-template-columns: minmax(110px, 180px) minmax(0, 1fr) minmax(56px, auto);
   align-items: center;
@@ -1253,28 +1249,13 @@ h3 {
   background: rgba(0, 0, 0, 0.18);
 }
 
-.category-average-item {
-  grid-template-columns: minmax(120px, 220px) minmax(0, 1fr);
-}
-
-.category-average-item > div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(64px, auto);
-  align-items: center;
-  gap: 12px;
-}
-
-.breakdown-row span,
-.category-average-item span,
-.review-rating-list dt {
+.breakdown-row span {
   color: var(--color-muted);
   font-size: 0.86rem;
   font-weight: 900;
 }
 
-.breakdown-row strong,
-.category-average-item strong,
-.review-rating-list dd {
+.breakdown-row strong {
   margin: 0;
   color: var(--color-white);
   font-weight: 900;
@@ -1488,10 +1469,7 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .breakdown-row,
-  .category-average-item,
-  .category-average-item > div,
-  .review-rating-list div {
+  .breakdown-row {
     grid-template-columns: 1fr;
   }
 
