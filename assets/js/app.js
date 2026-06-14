@@ -15,6 +15,18 @@ const databaseState = {
 };
 
 const FAVORITE_KEY = "ahe-lab-favorites";
+const RATING_STANDARD_ITEMS = [
+  { key: "eyeFocus", label: "寄り目・白目" },
+  { key: "tongueOut", label: "舌出し" },
+  { key: "drool", label: "よだれ" },
+  { key: "doublePeace", label: "ダブルピース" },
+  { key: "tearsPien", label: "涙・ぴえん" },
+  { key: "pleasure", label: "愉悦・快感" },
+  { key: "despairFear", label: "絶望・恐怖" },
+  { key: "loyaltySubmission", label: "忠誠・服従" },
+  { key: "expressionDuration", label: "表情維持時間" },
+  { key: "workConcept", label: "作品コンセプト" }
+];
 
 // Text helpers keep generated HTML safe and URLs consistent.
 function escapeHtml(value) {
@@ -403,6 +415,42 @@ function renderScoreDetails(record) {
       <dd>${escapeHtml(value)}</dd>
     </div>
   `).join("");
+}
+
+function getRatingValue(record, key) {
+  const value = record.rating?.[key];
+
+  return Number.isInteger(value) && value >= 0 && value <= 10 ? value : null;
+}
+
+function getRatingTotal(record) {
+  const values = RATING_STANDARD_ITEMS.map((item) => getRatingValue(record, item.key));
+  const hasCompleteRating = values.every((value) => value !== null);
+
+  return hasCompleteRating
+    ? values.reduce((sum, value) => sum + value, 0)
+    : record.score;
+}
+
+function renderRatingStandard(record) {
+  return `
+    <div class="rating-standard-grid">
+      ${RATING_STANDARD_ITEMS.map((item) => {
+        const value = getRatingValue(record, item.key);
+
+        return `
+          <div class="rating-standard-item">
+            <span>${escapeHtml(item.label)}</span>
+            <strong>${value === null ? "未評価" : `${escapeHtml(value)}/10`}</strong>
+          </div>
+        `;
+      }).join("")}
+    </div>
+    <div class="rating-standard-total">
+      <span>AHE SCORE</span>
+      <strong>${escapeHtml(getRatingTotal(record))}/100</strong>
+    </div>
+  `;
 }
 
 function renderMetadataRows(record) {
@@ -808,6 +856,12 @@ function renderWorkPage(records) {
         <dl class="detail-meta score-breakdown">
           ${renderScoreDetails(record)}
         </dl>
+      </section>
+
+      <section class="detail-section" aria-labelledby="rating-standard-title">
+        <h2 id="rating-standard-title">AHE LAB Rating</h2>
+        <p class="section-note">AHE LAB Rating Standard v1.0</p>
+        ${renderRatingStandard(record)}
       </section>
 
       <section class="detail-section" aria-labelledby="metadata-title">

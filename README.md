@@ -132,6 +132,7 @@ Recommended fields:
 - `verification`
 - `metadata`
 - `scoreDetails`
+- `rating`
 - `tagCategories`
 
 ID numbering rules:
@@ -183,6 +184,8 @@ Final checklist before commit:
 - `id` is unique.
 - `publishedAt` uses `YYYY-MM-DD`.
 - `score` is an integer from `0` to `100`.
+- `rating` values are integers from `0` to `10` when present.
+- If all 10 `rating` items are entered, their total should match `score`.
 - `intensity` is `Low`, `Medium`, or `High`.
 - `status` is `Draft`, `Researching`, `Cataloged`, or `Reviewed`.
 - Tags, circle, and characters match the naming rules above.
@@ -251,9 +254,36 @@ Field rules:
 - `verification`: Store the current verification label, for example `Full Verified`.
 - `metadata`: Store stable identifiers such as `productId`, `maker`, `label`, `runtime`, and `verification`.
 - `scoreDetails`: Store named integer sub-scores from `0` to `100`.
+- `rating`: Store AHE LAB Rating Standard v1.0 item scores from `0` to `10`.
 - `tagCategories`: Group tags by category while keeping the flat `tags` array for search compatibility.
 - `thumbnail.label`: Keep this short, usually the record number such as `#0021`.
 - `thumbnail.accent` and `thumbnail.background`: Use six-digit hex colors.
+
+## AHE LAB Rating Standard v1.0
+
+AHE LAB officially uses the following 10-item rating standard.
+
+Each item is scored from `0` to `10`. The sum of all 10 items is the AHE SCORE from `0` to `100`.
+
+- `eyeFocus`: 寄り目・白目
+- `tongueOut`: 舌出し
+- `drool`: よだれ
+- `doublePeace`: ダブルピース
+- `tearsPien`: 涙・ぴえん
+- `pleasure`: 愉悦・快感
+- `despairFear`: 絶望・恐怖
+- `loyaltySubmission`: 忠誠・服従
+- `expressionDuration`: 表情維持時間
+- `workConcept`: 作品コンセプト
+
+Rating rules:
+
+- Enter each value as an integer from `0` to `10`.
+- Do not use decimals or text values.
+- Leave an item absent only when it has not been evaluated.
+- Work pages display absent items as `未評価`.
+- When all 10 items are entered, set `score` to their total.
+- Keep the `rating` object even when future metadata grows around it; this object is the official score source.
 
 ## Admin Import Helper
 
