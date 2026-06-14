@@ -546,6 +546,18 @@
     "characters": [
       "冬愛ことね"
     ],
+    "rating": {
+      "eyeFocus": 10,
+      "tongueOut": 10,
+      "drool": 8,
+      "doublePeace": 10,
+      "tearsPien": 10,
+      "pleasure": 9,
+      "despairFear": 9,
+      "loyaltySubmission": 10,
+      "expressionDuration": 10,
+      "workConcept": 10
+    },
     "thumbnail": {
       "label": "#000001",
       "accent": "#7C5CFF",
