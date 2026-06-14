@@ -40,10 +40,10 @@ No external libraries are required.
 │   └── js/
 │       └── app.js
 ├── data/
-│   └── ahe-records.json
+│   ├── ahe-records.json
+│   └── sample.json
 ├── schema/
 │   └── ahe-record.schema.json
-├── sample.json
 ├── template.json
 ├── robots.txt
 ├── rss.xml
@@ -69,14 +69,14 @@ Adding one valid record automatically updates:
 
 ## Adding a New Work
 
-1. Open `sample.json`.
+1. Open `data/sample.json`.
 2. Copy the object.
 3. Replace every placeholder value with production data.
 4. Append the completed object to the array in `data/ahe-records.json`.
 5. Confirm the new `id` is unique and sequential.
 6. Run local checks before publishing.
 
-`template.json` is kept as a compact legacy template. `sample.json` is the recommended input sample for day-to-day operation.
+`template.json` is kept as a compact legacy template. `data/sample.json` is the recommended input sample for day-to-day operation.
 
 After one valid record is added to `data/ahe-records.json`, the browser-generated pages update automatically:
 
@@ -91,6 +91,91 @@ After one valid record is added to `data/ahe-records.json`, the browser-generate
 - Sitemap page (`sitemap.html`)
 
 The static `sitemap.xml` and `rss.xml` files are committed snapshots. Regenerate or update them during release work when search-engine feeds must include new records.
+
+## New Record Checklist
+
+Use `data/sample.json` as the template for every new record.
+
+Before editing:
+
+- Confirm the work belongs in AHE LAB's archive scope.
+- Confirm the next available ID by checking the last `id` in `data/ahe-records.json`.
+- Check existing tags, circle names, and character names before creating new wording.
+
+Required fields:
+
+- `id`
+- `title`
+- `medium`
+- `year`
+- `publishedAt`
+- `score`
+- `intensity`
+- `status`
+- `tags`
+- `note`
+- `circle`
+- `characters`
+
+Recommended fields:
+
+- `thumbnail.label`
+- `thumbnail.accent`
+- `thumbnail.background`
+
+ID numbering rules:
+
+- Use `AHE-0001` style IDs.
+- Use four digits after `AHE-`.
+- Assign the next unused number.
+- Do not rename an existing ID after publication, because URLs use `work.html?id=...`.
+- Do not reuse deleted or rejected IDs.
+
+Naming rules:
+
+- Keep JSON field names exactly as shown in `data/sample.json`.
+- Use English labels for stable archive terms when possible.
+- Use one spelling consistently across all records.
+- Avoid decorative punctuation, emoji, and temporary notes in public fields.
+- Keep `title` readable as a public archive title.
+
+Tag rules:
+
+- Use lowercase kebab-case, for example `panel-study`.
+- Use singular tags unless an existing plural tag is already established.
+- Reuse existing tags before creating a near-duplicate.
+- Add only tags that help search, classification, or research comparison.
+- Do not use spaces, uppercase letters, or punctuation other than hyphens.
+- Keep each record's `tags` array unique.
+
+Character notation:
+
+- Write character names as display names, for example `Mio Archive`.
+- Use the same spelling every time the same character appears.
+- Add multiple characters as separate array values.
+- Do not combine multiple characters in one string.
+- Keep each record's `characters` array unique.
+
+Circle notation:
+
+- Write one circle name in `circle`.
+- Use the public display name, for example `Archive Unit 01`.
+- Reuse the exact existing circle name for repeat works.
+- Do not add aliases, notes, or multiple circles in the same field.
+
+Final checklist before commit:
+
+- The record is valid JSON.
+- The new object is inside the top-level array in `data/ahe-records.json`.
+- There is a comma between records, but not after the final record.
+- Required fields are present and non-empty.
+- `id` is unique.
+- `publishedAt` uses `YYYY-MM-DD`.
+- `score` is an integer from `0` to `100`.
+- `intensity` is `Low`, `Medium`, or `High`.
+- `status` is `Draft`, `Researching`, `Cataloged`, or `Reviewed`.
+- Tags, circle, and characters match the naming rules above.
+- Local validation commands pass.
 
 ## Input Rules
 
@@ -173,7 +258,7 @@ node --check assets/js/app.js
 node --check admin/import.js
 python3 -m json.tool data/ahe-records.json
 python3 -m json.tool schema/ahe-record.schema.json
-python3 -m json.tool sample.json
+python3 -m json.tool data/sample.json
 python3 -m json.tool template.json
 python3 -m http.server 4173
 ```
