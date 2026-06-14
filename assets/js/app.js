@@ -1,5 +1,6 @@
 const DATA_PATH = "data/ahe-records.json";
 
+// Shared state for the database page filters.
 const databaseState = {
   query: "",
   activeTag: "all",
@@ -15,6 +16,7 @@ const databaseState = {
 
 const FAVORITE_KEY = "ahe-lab-favorites";
 
+// Text helpers keep generated HTML safe and URLs consistent.
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -64,6 +66,7 @@ function setMeta(title, description, canonical = getCurrentRelativeUrl()) {
   setTagAttribute('link[rel="canonical"]', "href", canonical);
 }
 
+// JSON-LD is generated at runtime so query-based pages can expose page-specific metadata.
 function setJsonLd(data) {
   let script = document.querySelector("#json-ld");
 
@@ -77,6 +80,7 @@ function setJsonLd(data) {
   script.textContent = JSON.stringify(data);
 }
 
+// Data accessors and aggregation helpers. All pages derive from data/ahe-records.json.
 function getRecordSearchText(record) {
   return normalize([
     record.id,
@@ -94,6 +98,7 @@ function getRecordSearchText(record) {
   ].join(" "));
 }
 
+// Favorites are intentionally local-only; no server or account is required.
 function getFavorites() {
   try {
     return JSON.parse(localStorage.getItem(FAVORITE_KEY)) || [];
@@ -179,6 +184,7 @@ function getRelatedRecords(records, currentRecord, limit = 6) {
     .map((item) => item.record);
 }
 
+// Sorting and filtering are shared by Home preview, Database, and generated listing pages.
 function sortRecords(records, sortBy) {
   return [...records].sort((a, b) => {
     if (sortBy === "newest") {
@@ -200,8 +206,8 @@ function sortRecords(records, sortBy) {
 function filterRecords(records, state) {
   const query = normalize(state.query);
   const selectedTags = state.selectedTags || [];
-  const scoreMin = state.scoreMin === "" ? 0 : Number(state.scoreMin);
-  const scoreMax = state.scoreMax === "" ? 100 : Number(state.scoreMax);
+  const scoreMin = state.scoreMin === "" || state.scoreMin == null ? 0 : Number(state.scoreMin);
+  const scoreMax = state.scoreMax === "" || state.scoreMax == null ? 100 : Number(state.scoreMax);
   const selectedCircle = normalize(state.circle);
   const selectedCharacter = normalize(state.character);
 
@@ -230,6 +236,7 @@ async function loadRecords() {
   return response.json();
 }
 
+// Header and footer are rendered once per page to avoid duplicating layout HTML.
 function renderLayout(activePage) {
   const header = document.querySelector("#site-header");
   const footer = document.querySelector("#site-footer");
@@ -278,6 +285,7 @@ function renderLayout(activePage) {
   }
 }
 
+// Reusable render helpers for generated archive cards and navigation.
 function renderBreadcrumb(items) {
   return `
     <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -354,6 +362,7 @@ function renderRecordGrid(records) {
   return records.map((record) => renderRecordCard(record, "database")).join("");
 }
 
+// Page renderers.
 function renderHomePreview(records) {
   const previewRecords = sortRecords(records, "score").slice(0, 4);
   const latestRecords = sortRecords(records, "newest").slice(0, 3);
@@ -1124,6 +1133,7 @@ function renderError() {
   }
 }
 
+// App bootstrap: choose the renderer based on body[data-page].
 document.addEventListener("DOMContentLoaded", async () => {
   const page = document.body.dataset.page || "home";
   renderLayout(page);

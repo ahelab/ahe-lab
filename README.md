@@ -1,101 +1,59 @@
 # AHE LAB
 
-> Expression Archive Institute
+Expression Archive Institute
 
-アヘ顔文化をアーカイブする研究所。
-
----
-
-## Mission
-
-AHE LABは、アヘ顔という表現を
-記録・分類・検索可能なデータベースとして
-未来に残すことを目的としたプロジェクトです。
-
-私たちはアヘ顔を、
-一つの表現であり、一つの文化であると考えています。
-
----
-
-## Vision
-
-IMDbが映画を記録し、
-
-MyAnimeListがアニメを記録するように、
-
-AHE LABはアヘ顔文化を記録します。
-
----
-
-## MVP
-
-- 作品データベース
-- タグ検索
-- 表現分類
-- AHE SCORE
-
----
-
-## Roadmap
-
-- [x] Brand Identity
-- [x] Logo
-- [x] X Account
-- [x] GitHub Repository
-- [ ] MVP Development
-- [ ] 50 Works Archive
-- [ ] Public Release
-
----
-
-## Philosophy
+AHE LAB is a static, JSON-driven archive site for documenting, classifying, and searching expression records.
 
 Archive First.
 
----
+## Tech Stack
 
-## 新しい作品の追加方法
+- HTML
+- CSS
+- Vanilla JavaScript
+- JSON
+- GitHub Pages
 
-AHE LABは `data/ahe-records.json` を唯一の作品データソースとして扱います。
-新しい作品を追加するときは、`template.json` をコピーして必要項目を埋め、
-`data/ahe-records.json` の配列末尾に1件追加してください。
+No external libraries are required.
 
-### 必須項目
+## Directory Structure
 
-- `id`: `AHE-0001` 形式の一意なID
-- `title`: 作品タイトル
-- `medium`: 媒体
-- `year`: 年
-- `publishedAt`: `YYYY-MM-DD` 形式の日付
-- `score`: 0から100のAHE SCORE
-- `intensity`: `Low` / `Medium` / `High`
-- `status`: `Draft` / `Researching` / `Cataloged` / `Reviewed`
-- `tags`: 1件以上のタグ配列
-- `note`: 研究メモ
-- `circle`: サークル名
-- `characters`: 1件以上のキャラクター配列
+```text
+.
+├── index.html
+├── database.html
+├── work.html
+├── tag.html
+├── circle.html
+├── character.html
+├── ranking.html
+├── stats.html
+├── sitemap.html
+├── about.html
+├── 404.html
+├── admin/
+│   ├── import.html
+│   └── import.js
+├── assets/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── app.js
+├── data/
+│   └── ahe-records.json
+├── schema/
+│   └── ahe-record.schema.json
+├── template.json
+├── robots.txt
+├── rss.xml
+└── sitemap.xml
+```
 
-### 任意項目
+## Data Source
 
-- `thumbnail`: カード用の表示メタデータ
-  - `label`
-  - `accent`
-  - `background`
+`data/ahe-records.json` is the single source of truth for archive records.
 
-### バリデーション
-
-構造の基準は `schema/ahe-record.schema.json` に定義しています。
-追加前に以下を確認してください。
-
-- JSONとして構文エラーがない
-- `id` が重複していない
-- 必須項目がすべて入っている
-- `score` が0から100の整数になっている
-- `publishedAt` が `YYYY-MM-DD` 形式になっている
-
-### 反映されるページ
-
-`data/ahe-records.json` に1件追加すると、以下が自動更新されます。
+Adding one valid record automatically updates:
 
 - Home
 - Database
@@ -106,159 +64,92 @@ AHE LABは `data/ahe-records.json` を唯一の作品データソースとして
 - Ranking
 - Stats
 - Sitemap
+- RSS
 
+## Adding a New Work
+
+1. Open `template.json`.
+2. Copy the object.
+3. Fill in the required fields.
+4. Append it to the array in `data/ahe-records.json`.
+5. Confirm the new `id` is unique.
+6. Run local checks before publishing.
+
+Required fields:
+
+- `id`: `AHE-0001` format
+- `title`
+- `medium`
+- `year`
+- `publishedAt`: `YYYY-MM-DD`
+- `score`: integer from 0 to 100
+- `intensity`: `Low`, `Medium`, or `High`
+- `status`: `Draft`, `Researching`, `Cataloged`, or `Reviewed`
+- `tags`: non-empty array
+- `note`
+- `circle`
+- `characters`: non-empty array
+
+Optional field:
+
+- `thumbnail`
+  - `label`
+  - `accent`
+  - `background`
+
+## Admin Import Helper
+
+Use `admin/import.html` to validate and preview a pasted JSON record in the browser.
+
+The helper checks:
+
+- Required fields
+- ID format
+- Duplicate ID
+- Score range
+- Tag array
+- Character array
+- Date format
+
+It does not write files directly. Copy the merged JSON output into `data/ahe-records.json`.
+
+## Validation
+
+Run these checks before committing:
+
+```bash
+node --check assets/js/app.js
+node --check admin/import.js
+python3 -m json.tool data/ahe-records.json
+python3 -m json.tool schema/ahe-record.schema.json
+python3 -m json.tool template.json
+python3 -m http.server 4173
 ```
 
----
+Then verify pages in the browser:
 
-# そしてGitHubをもっと活用しよう
+- `index.html`
+- `database.html`
+- `work.html?id=AHE-0001`
+- `tag.html`
+- `circle.html`
+- `character.html`
+- `ranking.html`
+- `stats.html`
+- `sitemap.html`
+- `admin/import.html`
 
-上のタブに
+## Naming Rules
 
-```
-Code
+- HTML pages use lowercase names.
+- CSS lives in `assets/css/style.css`.
+- Site JavaScript lives in `assets/js/app.js`.
+- Admin-only JavaScript lives beside the admin page.
+- Record IDs use `AHE-0001` format.
+- Query pages use `?id=` for works and `?name=` for tags, circles, and characters.
 
-Issues
-
-Pull requests
-
-Actions
-
-Projects
-```
-
-があるよね。
-
-これが全部使える。
-
----
-
-## 今日やること
-
-### ① Issues
-
-「Issues」をクリック。
-
-そして
-
-```
-New Issue
-```
-
-を押す。
-
----
-
-### Issue #1
-
-```
-Title
-
-Create MVP Homepage
-
-Body
-
-- Hero Section
-- Search Bar
-- Latest Works
-- Footer
-```
-
----
-
-### Issue #2
-
-```
-Database Design
-
-- Works
-- Actress
-- Tags
-- Score
-```
-
----
-
-### Issue #3
-
-```
-Logo Refinement
-```
-
----
-
-# 学長が一番おすすめしたい機能
-
-GitHubは
-
-**「やることリスト」ではなく研究ノートになる。**
-
-例えば
-
-```
-Research
-
-#001
-アヘ顔ダブルピースの初出
-
-Status
-Researching
-
-References
-...
-
-Notes
-...
-```
-
-これをIssueで管理できる。
-
----
-
-# さらに思いついた
-
-AHE LABは
-
-```
-📚 DATABASE
-
-🔬 RESEARCH
-
-📖 TIMELINE
-
-🏷 TAGS
-```
-
-の4本柱にした方がブランドが強い。
-
-単なるまとめサイトじゃない。
-
----
-
-# 最後に
-
-私はREADMEの最初に、この一文を置きたい。
-
-```markdown
-# AHE LAB
-
-Expression Archive Institute
-
-アヘ顔文化をアーカイブする研究所。
+## Philosophy
 
 Archive First.
-```
 
-**Archive First.（まず記録する。）**
-
-この一言が、AHE LABの哲学になる。
-
-収益より先に、文化を記録する。
-
-その姿勢が結果的にブランドになり、他のまとめサイトにはない価値を生む。
-
-そしてGitHubの履歴を見るたびに、
-
-> 2026年6月8日、README一枚から始まった。
-
-という記録がずっと残り続ける。
+The project prioritizes durable records, clear classification, and maintainable static publishing.
