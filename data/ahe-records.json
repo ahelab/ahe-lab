@@ -546,6 +546,25 @@
     "characters": [
       "冬愛ことね"
     ],
+    "performers": [
+      "冬愛ことね"
+    ],
+    "maker": "MILK",
+    "label": "MILK",
+    "release": "2025-09-25",
+    "runtime": "Unrecorded",
+    "verification": "Full Verified",
+    "archiveNote": "本作品は、作品コンセプトおよび公開されているサンプル画像・商品情報から、アヘ顔表現を主要な演出要素として扱っていることが確認できる。",
+    "sourceNote": "Product ID: h_1240milk259。公開されている商品情報およびサンプル画像を確認。",
+    "curatorNote": "公開レビューにおいてもアヘ顔演出に言及があり、AHE LABの研究対象作品として登録する価値が高い。",
+    "metadata": {
+      "productId": "h_1240milk259",
+      "maker": "MILK",
+      "label": "MILK",
+      "runtime": "Unrecorded",
+      "verification": "Full Verified",
+      "sourceNote": "公開商品情報およびサンプル画像を確認"
+    },
     "rating": {
       "eyeFocus": 10,
       "tongueOut": 10,
@@ -558,6 +577,27 @@
       "expressionDuration": 10,
       "workConcept": 10
     },
+    "communityReviews": [
+      {
+        "nickname": "AHELAB",
+        "role": "Curator Review",
+        "createdAt": "2026-06-14",
+        "rating": {
+          "eyeFocus": 10,
+          "tongueOut": 10,
+          "drool": 8,
+          "doublePeace": 10,
+          "tearsPien": 10,
+          "pleasure": 9,
+          "despairFear": 9,
+          "loyaltySubmission": 10,
+          "expressionDuration": 10,
+          "workConcept": 10
+        },
+        "comment": "立ち上げ初期のサンプルレビューとして登録。",
+        "helpfulCount": 0
+      }
+    ],
     "thumbnail": {
       "label": "#000001",
       "accent": "#7C5CFF",

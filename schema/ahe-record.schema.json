@@ -115,6 +115,14 @@
         "type": "string",
         "minLength": 1
       },
+      "sourceNote": {
+        "type": "string",
+        "minLength": 1
+      },
+      "curatorNote": {
+        "type": "string",
+        "minLength": 1
+      },
       "verification": {
         "type": "string",
         "minLength": 1
@@ -233,6 +241,112 @@
           "items": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      },
+      "communityReviews": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["nickname", "createdAt", "rating", "comment"],
+          "properties": {
+            "nickname": {
+              "type": "string",
+              "minLength": 1
+            },
+            "role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date"
+            },
+            "rating": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "eyeFocus": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "tongueOut": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "drool": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "doublePeace": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "tearsPien": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "pleasure": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "despairFear": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "fearDespair": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "loyaltySubmission": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "submission": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "expressionDuration": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "duration": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "workConcept": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "concept": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                }
+              }
+            },
+            "comment": {
+              "type": "string",
+              "minLength": 1
+            },
+            "helpfulCount": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         }
       },

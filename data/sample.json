@@ -25,6 +25,8 @@
   "runtime": "00:00",
   "archiveNote": "研究アーカイブとしての登録理由を記録します。",
   "reviewerNote": "確認者による補足や評価根拠を記録します。",
+  "sourceNote": "参照した公開情報や確認範囲を記録します。",
+  "curatorNote": "Curatorとしての補足メモを記録します。",
   "verification": "Draft",
   "metadata": {
     "productId": "product-id",
@@ -51,6 +53,27 @@
     "expressionDuration": 8,
     "workConcept": 8
   },
+  "communityReviews": [
+    {
+      "nickname": "AHELAB",
+      "role": "Curator Review",
+      "createdAt": "2026-06-14",
+      "rating": {
+        "eyeFocus": 8,
+        "tongueOut": 8,
+        "drool": 8,
+        "doublePeace": 8,
+        "tearsPien": 8,
+        "pleasure": 8,
+        "despairFear": 8,
+        "loyaltySubmission": 8,
+        "expressionDuration": 8,
+        "workConcept": 8
+      },
+      "comment": "立ち上げ初期のサンプルレビューとして登録。",
+      "helpfulCount": 0
+    }
+  ],
   "tagCategories": {
     "expression": [
       "archive-first"

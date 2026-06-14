@@ -22,10 +22,10 @@ const RATING_STANDARD_ITEMS = [
   { key: "doublePeace", label: "ダブルピース" },
   { key: "tearsPien", label: "涙・ぴえん" },
   { key: "pleasure", label: "愉悦・快感" },
-  { key: "despairFear", label: "絶望・恐怖" },
-  { key: "loyaltySubmission", label: "忠誠・服従" },
-  { key: "expressionDuration", label: "表情維持時間" },
-  { key: "workConcept", label: "作品コンセプト" }
+  { key: "despairFear", label: "絶望・恐怖", aliases: ["fearDespair"] },
+  { key: "loyaltySubmission", label: "忠誠・服従", aliases: ["submission"] },
+  { key: "expressionDuration", label: "表情維持時間", aliases: ["duration"] },
+  { key: "workConcept", label: "作品コンセプト", aliases: ["concept"] }
 ];
 
 // Text helpers keep generated HTML safe and URLs consistent.
@@ -453,6 +453,215 @@ function renderRatingStandard(record) {
   `;
 }
 
+function getCommunityReviews(record) {
+  return Array.isArray(record.communityReviews) ? record.communityReviews : [];
+}
+
+function getReviewRatingValue(review, item) {
+  const rating = review.rating || {};
+  const value = rating[item.key] ?? (item.aliases || []).map((alias) => rating[alias]).find((aliasValue) => aliasValue != null);
+
+  return Number.isInteger(value) && value >= 0 && value <= 10 ? value : null;
+}
+
+function getReviewScore(review) {
+  const values = RATING_STANDARD_ITEMS.map((item) => getReviewRatingValue(review, item));
+
+  return values.every((value) => value !== null)
+    ? values.reduce((sum, value) => sum + value, 0)
+    : null;
+}
+
+function getCommunityScore(reviews) {
+  const scores = reviews.map(getReviewScore).filter((score) => score !== null);
+
+  return scores.length
+    ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+    : null;
+}
+
+function getCategoryAverage(reviews, item) {
+  const values = reviews.map((review) => getReviewRatingValue(review, item)).filter((value) => value !== null);
+
+  return values.length
+    ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10
+    : null;
+}
+
+function renderMeter(value, max = 10) {
+  const percent = value == null ? 0 : Math.max(0, Math.min(100, (value / max) * 100));
+
+  return `
+    <span class="rating-meter" aria-hidden="true">
+      <span style="width: ${percent}%"></span>
+    </span>
+  `;
+}
+
+function renderScoreSummary(record) {
+  const reviews = getCommunityReviews(record);
+  const communityScore = getCommunityScore(reviews);
+
+  if (communityScore === null) {
+    return `
+      <section class="detail-section score-summary" aria-labelledby="score-summary-title">
+        <h2 id="score-summary-title">AHE Score</h2>
+        <p class="empty-state">No community score yet</p>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="detail-section score-summary" aria-labelledby="score-summary-title">
+      <h2 id="score-summary-title">AHE Score</h2>
+      <div class="community-score-value">${escapeHtml(communityScore)}/100</div>
+      <p>Based on ${escapeHtml(reviews.length)} community review${reviews.length === 1 ? "" : "s"}</p>
+    </section>
+  `;
+}
+
+function renderRatingBreakdown(record) {
+  const reviews = getCommunityReviews(record);
+  const scores = reviews.map(getReviewScore).filter((score) => score !== null);
+  const buckets = [
+    { label: "90-100", min: 90, max: 100 },
+    { label: "80-89", min: 80, max: 89 },
+    { label: "70-79", min: 70, max: 79 },
+    { label: "60-69", min: 60, max: 69 },
+    { label: "Below 60", min: 0, max: 59 }
+  ];
+
+  return `
+    <section class="detail-section" aria-labelledby="rating-breakdown-title">
+      <h2 id="rating-breakdown-title">Rating Breakdown</h2>
+      <div class="review-breakdown">
+        ${buckets.map((bucket) => {
+          const count = scores.filter((score) => score >= bucket.min && score <= bucket.max).length;
+          const percent = scores.length ? Math.round((count / scores.length) * 100) : 0;
+
+          return `
+            <div class="breakdown-row">
+              <span>${escapeHtml(bucket.label)}</span>
+              ${renderMeter(percent, 100)}
+              <strong>${escapeHtml(percent)}%</strong>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderCategoryAverage(record) {
+  const reviews = getCommunityReviews(record);
+
+  if (reviews.length === 0) {
+    return `
+      <section class="detail-section" aria-labelledby="category-average-title">
+        <h2 id="category-average-title">Category Average</h2>
+        <p class="empty-state">No community ratings yet</p>
+      </section>
+    `;
+  }
+
+  return `
+    <section class="detail-section" aria-labelledby="category-average-title">
+      <h2 id="category-average-title">Category Average</h2>
+      <p class="section-note">AHE LAB Rating Standard v1.0</p>
+      <div class="category-average-grid">
+        ${RATING_STANDARD_ITEMS.map((item) => {
+          const average = getCategoryAverage(reviews, item);
+
+          return `
+            <div class="category-average-item">
+              <span>${escapeHtml(item.label)}</span>
+              <div>
+                ${renderMeter(average)}
+                <strong>${average === null ? "未評価" : `${escapeHtml(average)}/10`}</strong>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderReviewRatingList(review) {
+  return `
+    <dl class="review-rating-list">
+      ${RATING_STANDARD_ITEMS.map((item) => {
+        const value = getReviewRatingValue(review, item);
+
+        return `
+          <div>
+            <dt>${escapeHtml(item.label)}</dt>
+            <dd>${value === null ? "未評価" : `${escapeHtml(value)}/10`}</dd>
+          </div>
+        `;
+      }).join("")}
+    </dl>
+  `;
+}
+
+function renderCommunityReviews(record) {
+  const reviews = getCommunityReviews(record);
+
+  return `
+    <section class="detail-section" aria-labelledby="community-reviews-title">
+      <h2 id="community-reviews-title">Community Reviews</h2>
+      ${reviews.length === 0 ? '<p class="empty-state">No community reviews yet</p>' : reviews.map((review) => {
+        const score = getReviewScore(review);
+
+        return `
+          <article class="community-review">
+            <header>
+              <div>
+                <h3>${escapeHtml(review.nickname)}</h3>
+                <p>${escapeHtml(review.role || "Community Review")}</p>
+              </div>
+              <time datetime="${escapeHtml(review.createdAt)}">${escapeHtml(review.createdAt)}</time>
+            </header>
+            <p class="review-score">AHE Score: ${score === null ? "未評価" : `${escapeHtml(score)}/100`}</p>
+            ${renderReviewRatingList(review)}
+            <div class="review-comment">
+              <h4>Comment</h4>
+              <p>${escapeHtml(review.comment || "No comment recorded.")}</p>
+            </div>
+            <p class="helpful-count">Helpful ${escapeHtml(review.helpfulCount || 0)}</p>
+          </article>
+        `;
+      }).join("")}
+    </section>
+  `;
+}
+
+function renderOfficialArchiveNote(record) {
+  const metadata = record.metadata || {};
+
+  return `
+    <section class="detail-section note-grid" aria-labelledby="archive-note-title">
+      <h2 id="archive-note-title">Official Archive Note</h2>
+      <article>
+        <h3>Verification</h3>
+        <p>${escapeHtml(record.verification || metadata.verification || record.status)}</p>
+      </article>
+      <article>
+        <h3>Archive Note</h3>
+        <p>${escapeHtml(record.archiveNote || record.note)}</p>
+      </article>
+      <article>
+        <h3>Source Note</h3>
+        <p>${escapeHtml(record.sourceNote || metadata.sourceNote || "No source note recorded.")}</p>
+      </article>
+      <article>
+        <h3>Curator Note</h3>
+        <p>${escapeHtml(record.curatorNote || record.reviewerNote || "No curator note recorded.")}</p>
+      </article>
+    </section>
+  `;
+}
+
 function renderMetadataRows(record) {
   const metadata = record.metadata || {};
   const baseRows = [
@@ -787,6 +996,10 @@ function renderWorkPage(records) {
   const maker = record ? getRecordMaker(record) : "";
   const release = record ? getRecordRelease(record) : "";
   const archiveNote = record ? getRecordArchiveNote(record) : "";
+  const metadata = record?.metadata || {};
+  const productId = metadata.productId || "Unrecorded";
+  const communityReviews = record ? getCommunityReviews(record) : [];
+  const communityScore = getCommunityScore(communityReviews);
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -796,7 +1009,7 @@ function renderWorkPage(records) {
 
   setMeta(
     `${record.title} | AHE LAB`,
-    `${record.title} record with AHE SCORE ${record.score}, maker ${maker}, and archive classification tags.`
+    `${record.title} community-reviewed archive record for ${maker}.`
   );
   setJsonLd({
     "@context": "https://schema.org",
@@ -808,12 +1021,12 @@ function renderWorkPage(records) {
     "creator": maker,
     "character": record.characters,
     "actor": performers,
-    "aggregateRating": {
+    "aggregateRating": communityScore === null ? undefined : {
       "@type": "AggregateRating",
-      "ratingValue": record.score,
+      "ratingValue": communityScore,
       "bestRating": 100,
       "worstRating": 0,
-      "ratingCount": 1
+      "ratingCount": communityReviews.length
     }
   });
 
@@ -822,9 +1035,17 @@ function renderWorkPage(records) {
       ${renderBackButton("database.html", "Back to Database")}
       ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
       <header class="detail-hero">
-        <p class="eyebrow">Work Detail / ${escapeHtml(record.id)}</p>
+        <p class="eyebrow">Work Header / ${escapeHtml(record.id)}</p>
         <h1 id="work-title">${escapeHtml(record.title)}</h1>
-        <p>${escapeHtml(archiveNote)}</p>
+        <dl class="work-header-meta">
+          ${renderMetaItem("Product ID", productId)}
+          ${renderMetaItem("Performer", performers.join(", "))}
+          ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
+          ${renderMetaItem("Release", release)}
+          ${renderMetaItem("Runtime", getRecordRuntime(record))}
+          ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
+        </dl>
+        <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
         <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
           ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
         </button>
@@ -835,65 +1056,19 @@ function renderWorkPage(records) {
         ${nextRecord ? `<a href="work.html?id=${encodeParam(nextRecord.id)}">${escapeHtml(nextRecord.title)} →</a>` : "<span></span>"}
       </nav>
 
-      <section class="detail-layout" aria-label="Work metadata">
-        <div class="detail-score">
-          <span>${escapeHtml(record.score)}</span>
-          <p>AHE SCORE</p>
-        </div>
+      ${renderScoreSummary(record)}
+      ${renderRatingBreakdown(record)}
+      ${renderCategoryAverage(record)}
 
-        <dl class="detail-meta">
-          ${renderMetaItem("Performer", performers.join(", "))}
-          ${renderMetaItem("Maker", maker, `circle.html?name=${encodeParam(record.circle)}`)}
-          ${renderMetaItem("Release", release)}
-          ${renderMetaItem("Runtime", getRecordRuntime(record))}
-          ${renderMetaItem("Intensity", record.intensity)}
-          ${renderMetaItem("Circle", record.circle, `circle.html?name=${encodeParam(record.circle)}`)}
-        </dl>
+      <section class="detail-section review-cta" aria-labelledby="review-cta-title">
+        <h2 id="review-cta-title">Write a Community Review</h2>
+        <p>AHE LABは訪問者のレビューによってスコアが育つアーカイブです。この作品を分析して、評価を投稿してください。</p>
+        <button id="write-review-button" type="button">Write Review</button>
+        <p class="review-cta-message" id="review-cta-message" role="status" aria-live="polite"></p>
       </section>
 
-      <section class="detail-section" aria-labelledby="score-detail-title">
-        <h2 id="score-detail-title">AHE Score Detail</h2>
-        <dl class="detail-meta score-breakdown">
-          ${renderScoreDetails(record)}
-        </dl>
-      </section>
-
-      <section class="detail-section" aria-labelledby="rating-standard-title">
-        <h2 id="rating-standard-title">AHE LAB Rating</h2>
-        <p class="section-note">AHE LAB Rating Standard v1.0</p>
-        ${renderRatingStandard(record)}
-      </section>
-
-      <section class="detail-section" aria-labelledby="metadata-title">
-        <h2 id="metadata-title">Metadata</h2>
-        <dl class="detail-meta metadata-grid">
-          ${renderMetadataRows(record)}
-        </dl>
-      </section>
-
-      <section class="detail-section note-grid" aria-labelledby="notes-title">
-        <h2 id="notes-title">Research Notes</h2>
-        <article>
-          <h3>Archive Note</h3>
-          <p>${escapeHtml(archiveNote)}</p>
-        </article>
-        <article>
-          <h3>Reviewer Note</h3>
-          <p>${escapeHtml(record.reviewerNote || "No reviewer note recorded.")}</p>
-        </article>
-      </section>
-
-      <section class="detail-section" aria-labelledby="characters-title">
-        <h2 id="characters-title">Characters</h2>
-        <div class="entity-links">${renderEntityLinks(record.characters, "character")}</div>
-      </section>
-
-      <section class="detail-section" aria-labelledby="tags-title">
-        <h2 id="tags-title">Tags</h2>
-        <div class="tag-category-grid">
-          ${renderCategorizedTags(record)}
-        </div>
-      </section>
+      ${renderCommunityReviews(record)}
+      ${renderOfficialArchiveNote(record)}
 
       <section class="detail-section" aria-labelledby="related-title">
         <h2 id="related-title">Related Works</h2>
@@ -908,6 +1083,10 @@ function renderWorkPage(records) {
   document.querySelector("#favorite-button").addEventListener("click", (event) => {
     const favorite = toggleFavorite(event.currentTarget.dataset.id);
     event.currentTarget.textContent = favorite ? "Remove Favorite" : "Add Favorite";
+  });
+
+  document.querySelector("#write-review-button").addEventListener("click", () => {
+    document.querySelector("#review-cta-message").textContent = "Review submission is not available yet.";
   });
 }
 

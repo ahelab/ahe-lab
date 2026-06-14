@@ -1009,6 +1009,42 @@ h3 {
   font-size: 1.08rem;
 }
 
+.work-header-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 100%;
+  margin: 22px 0 0;
+}
+
+.work-header-meta div {
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.work-header-meta dt {
+  color: var(--color-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.work-header-meta dd {
+  margin: 5px 0 0;
+  color: var(--color-white);
+  font-weight: 900;
+}
+
+.work-header-meta a {
+  color: var(--color-white);
+}
+
+.work-header-tags {
+  margin-top: 16px;
+}
+
 .detail-layout {
   display: grid;
   grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
@@ -1177,6 +1213,167 @@ h3 {
   font-size: 1.3rem;
 }
 
+.score-summary {
+  border-color: rgba(124, 92, 255, 0.45);
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.22), rgba(255, 255, 255, 0.05));
+}
+
+.community-score-value {
+  margin-top: 10px;
+  color: var(--color-white);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-summary p {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 800;
+}
+
+.review-breakdown,
+.category-average-grid,
+.review-rating-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.breakdown-row,
+.category-average-item,
+.review-rating-list div {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) minmax(0, 1fr) minmax(56px, auto);
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.category-average-item {
+  grid-template-columns: minmax(120px, 220px) minmax(0, 1fr);
+}
+
+.category-average-item > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(64px, auto);
+  align-items: center;
+  gap: 12px;
+}
+
+.breakdown-row span,
+.category-average-item span,
+.review-rating-list dt {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.breakdown-row strong,
+.category-average-item strong,
+.review-rating-list dd {
+  margin: 0;
+  color: var(--color-white);
+  font-weight: 900;
+}
+
+.rating-meter {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(124, 92, 255, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rating-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-purple);
+}
+
+.review-cta p {
+  max-width: 720px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+}
+
+.review-cta button {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 18px;
+  border: 1px solid var(--color-purple);
+  border-radius: 8px;
+  background: var(--color-purple);
+  color: var(--color-white);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.review-cta-message {
+  margin-top: 12px;
+  color: var(--color-white);
+  font-weight: 900;
+}
+
+.community-review {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.community-review header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.community-review h3,
+.community-review p {
+  margin: 0;
+}
+
+.community-review header p,
+.community-review time,
+.helpful-count {
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.review-score {
+  margin-top: 14px !important;
+  color: var(--color-white);
+  font-weight: 900;
+}
+
+.review-comment {
+  margin-top: 16px;
+}
+
+.review-comment h4 {
+  margin: 0 0 8px;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.review-comment p {
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+}
+
+.helpful-count {
+  margin-top: 14px !important;
+}
+
 .index-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1229,6 +1426,7 @@ h3 {
   .hero,
   .database-hero,
   .database-workspace,
+  .work-header-meta,
   .detail-layout,
   .note-grid,
   .tag-category-grid,
@@ -1288,5 +1486,16 @@ h3 {
 
   .detail-meta {
     grid-template-columns: 1fr;
+  }
+
+  .breakdown-row,
+  .category-average-item,
+  .category-average-item > div,
+  .review-rating-list div {
+    grid-template-columns: 1fr;
+  }
+
+  .community-review header {
+    flex-direction: column;
   }
 }
