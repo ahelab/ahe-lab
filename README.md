@@ -122,6 +122,17 @@ Recommended fields:
 - `thumbnail.label`
 - `thumbnail.accent`
 - `thumbnail.background`
+- `performers`
+- `maker`
+- `label`
+- `release`
+- `runtime`
+- `archiveNote`
+- `reviewerNote`
+- `verification`
+- `metadata`
+- `scoreDetails`
+- `tagCategories`
 
 ID numbering rules:
 
@@ -230,6 +241,17 @@ Field rules:
 - `note`: Explain why the work is classified in the archive.
 - `circle`: Use one circle name per record.
 - `characters`: Add at least one character name. Avoid duplicates within the same record.
+- `performers`: Use display names for performers. When a performer is also the indexed character, keep the spelling aligned with `characters`.
+- `maker`: Use the public maker name.
+- `label`: Use the public label name when it differs from or supplements `maker`.
+- `release`: Use `YYYY-MM-DD`. Keep it aligned with `publishedAt` when both represent the same date.
+- `runtime`: Use a compact display value such as `120 min` or `02:00:00`.
+- `archiveNote`: Store the research archive note shown on work pages.
+- `reviewerNote`: Store reviewer-specific observations or verification context.
+- `verification`: Store the current verification label, for example `Full Verified`.
+- `metadata`: Store stable identifiers such as `productId`, `maker`, `label`, `runtime`, and `verification`.
+- `scoreDetails`: Store named integer sub-scores from `0` to `100`.
+- `tagCategories`: Group tags by category while keeping the flat `tags` array for search compatibility.
 - `thumbnail.label`: Keep this short, usually the record number such as `#0021`.
 - `thumbnail.accent` and `thumbnail.background`: Use six-digit hex colors.
 
