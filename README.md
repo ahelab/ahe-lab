@@ -133,6 +133,7 @@ Recommended fields:
 - `metadata`
 - `scoreDetails`
 - `rating`
+- `communityReviews`
 - `tagCategories`
 
 ID numbering rules:
@@ -186,6 +187,7 @@ Final checklist before commit:
 - `score` is an integer from `0` to `100`.
 - `rating` values are integers from `0` to `10` when present.
 - If all 10 `rating` items are entered, their total should match `score`.
+- If `communityReviews` exists, Work pages use review averages as the public community score.
 - `intensity` is `Low`, `Medium`, or `High`.
 - `status` is `Draft`, `Researching`, `Cataloged`, or `Reviewed`.
 - Tags, circle, and characters match the naming rules above.
@@ -254,7 +256,8 @@ Field rules:
 - `verification`: Store the current verification label, for example `Full Verified`.
 - `metadata`: Store stable identifiers such as `productId`, `maker`, `label`, `runtime`, and `verification`.
 - `scoreDetails`: Store named integer sub-scores from `0` to `100`.
-- `rating`: Store AHE LAB Rating Standard v1.0 item scores from `0` to `10`.
+- `rating`: Store legacy or curator-side AHE LAB Rating Standard v1.0 item scores from `0` to `10`.
+- `communityReviews`: Store visitor and curator reviews used for the public community score.
 - `tagCategories`: Group tags by category while keeping the flat `tags` array for search compatibility.
 - `thumbnail.label`: Keep this short, usually the record number such as `#0021`.
 - `thumbnail.accent` and `thumbnail.background`: Use six-digit hex colors.
@@ -282,8 +285,10 @@ Rating rules:
 - Do not use decimals or text values.
 - Leave an item absent only when it has not been evaluated.
 - Work pages display absent items as `未評価`.
-- When all 10 items are entered, set `score` to their total.
-- Keep the `rating` object even when future metadata grows around it; this object is the official score source.
+- When all 10 items are entered in a review, that review's AHE Score is their total.
+- Work pages treat `communityReviews` as the public score source.
+- Keep the top-level `rating` object for backward compatibility; do not use it as a Community Review by itself.
+- Curator reviews belong in `communityReviews` with `role` set to `Curator Review`.
 
 ## Admin Import Helper
 
