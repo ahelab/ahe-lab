@@ -134,6 +134,7 @@ Recommended fields:
 - `scoreDetails`
 - `rating`
 - `communityReviews`
+- `externalLinks`
 - `tagCategories`
 
 ID numbering rules:
@@ -258,6 +259,7 @@ Field rules:
 - `scoreDetails`: Store named integer sub-scores from `0` to `100`.
 - `rating`: Store legacy or curator-side AHE LAB Rating Standard v1.0 item scores from `0` to `10`.
 - `communityReviews`: Store visitor and curator reviews used for the public community score.
+- `externalLinks`: Store official or marketplace reference links such as FANZA, DMM, or Official.
 - `tagCategories`: Group tags by category while keeping the flat `tags` array for search compatibility.
 - `thumbnail.label`: Keep this short, usually the record number such as `#0021`.
 - `thumbnail.accent` and `thumbnail.background`: Use six-digit hex colors.
@@ -288,7 +290,22 @@ Rating rules:
 - When all 10 items are entered in a review, that review's AHE Score is their total.
 - Work pages treat `communityReviews` as the public score source.
 - Keep the top-level `rating` object for backward compatibility; do not use it as a Community Review by itself.
-- Curator reviews belong in `communityReviews` with `role` set to `Curator Review`.
+- Curator reviews belong in `communityReviews` with `role` set to `Curator`.
+
+## Community Archive UI
+
+AHE LAB records works as an archive. Curators collect, register, and verify works; Community Reviews form the visible score.
+
+Work pages prioritize:
+
+- Work identity and metadata
+- Community Score
+- Review distribution
+- Community Reviews
+- Official Archive Note
+- External Links
+
+Do not describe curator ratings as a separate score source. Curator reviews use the same `communityReviews` structure as all other reviews.
 
 ## Admin Import Helper
 
