@@ -43,6 +43,7 @@ No external libraries are required.
 │   └── ahe-records.json
 ├── schema/
 │   └── ahe-record.schema.json
+├── sample.json
 ├── template.json
 ├── robots.txt
 ├── rss.xml
@@ -68,12 +69,45 @@ Adding one valid record automatically updates:
 
 ## Adding a New Work
 
-1. Open `template.json`.
+1. Open `sample.json`.
 2. Copy the object.
-3. Fill in the required fields.
-4. Append it to the array in `data/ahe-records.json`.
-5. Confirm the new `id` is unique.
+3. Replace every placeholder value with production data.
+4. Append the completed object to the array in `data/ahe-records.json`.
+5. Confirm the new `id` is unique and sequential.
 6. Run local checks before publishing.
+
+`template.json` is kept as a compact legacy template. `sample.json` is the recommended input sample for day-to-day operation.
+
+After one valid record is added to `data/ahe-records.json`, the browser-generated pages update automatically:
+
+- Home
+- Database
+- Ranking
+- Stats
+- Work
+- Tag
+- Circle
+- Character
+- Sitemap page (`sitemap.html`)
+
+The static `sitemap.xml` and `rss.xml` files are committed snapshots. Regenerate or update them during release work when search-engine feeds must include new records.
+
+## Input Rules
+
+Use `schema/ahe-record.schema.json` as the source of truth for validation.
+
+General rules:
+
+- Add only one JSON object per work.
+- Keep `data/ahe-records.json` as a single top-level array.
+- Do not add comments to JSON files.
+- Use double quotes for all JSON strings.
+- Keep field names exactly as defined by the schema.
+- Do not add fields that are not listed in the schema.
+- Use stable names for `tags`, `circle`, and `characters`; spelling changes create new generated pages.
+- Prefer lowercase kebab-case for tags, for example `panel-study`.
+- Keep circle and character names human-readable, for example `Archive Unit 01`.
+- Keep notes concise and classification-focused.
 
 Required fields:
 
@@ -96,6 +130,23 @@ Optional field:
   - `label`
   - `accent`
   - `background`
+
+Field rules:
+
+- `id`: Use the next unused ID, such as `AHE-0021`. Never reuse an ID.
+- `title`: Use the public archive title for the work.
+- `medium`: Use a short category such as `Illustration`, `Manga`, `Web`, `Video`, `Game`, or `Research`.
+- `year`: Use the original release or publication year.
+- `publishedAt`: Use `YYYY-MM-DD`.
+- `score`: Use an integer from `0` to `100`.
+- `intensity`: Use only `Low`, `Medium`, or `High`.
+- `status`: Use only `Draft`, `Researching`, `Cataloged`, or `Reviewed`.
+- `tags`: Add at least one tag. Avoid duplicates within the same record.
+- `note`: Explain why the work is classified in the archive.
+- `circle`: Use one circle name per record.
+- `characters`: Add at least one character name. Avoid duplicates within the same record.
+- `thumbnail.label`: Keep this short, usually the record number such as `#0021`.
+- `thumbnail.accent` and `thumbnail.background`: Use six-digit hex colors.
 
 ## Admin Import Helper
 
@@ -122,6 +173,7 @@ node --check assets/js/app.js
 node --check admin/import.js
 python3 -m json.tool data/ahe-records.json
 python3 -m json.tool schema/ahe-record.schema.json
+python3 -m json.tool sample.json
 python3 -m json.tool template.json
 python3 -m http.server 4173
 ```

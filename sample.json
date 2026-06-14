@@ -1,0 +1,24 @@
+{
+  "id": "AHE-0021",
+  "title": "Production Archive Record Title",
+  "medium": "Illustration",
+  "year": 2026,
+  "publishedAt": "2026-06-14",
+  "score": 80,
+  "intensity": "Medium",
+  "status": "Draft",
+  "tags": [
+    "archive-first",
+    "classification"
+  ],
+  "note": "作品の分類理由、参照ポイント、表現上の特徴を簡潔に記録します。",
+  "circle": "Production Circle Name",
+  "characters": [
+    "Production Character Name"
+  ],
+  "thumbnail": {
+    "label": "#0021",
+    "accent": "#7C5CFF",
+    "background": "#111115"
+  }
+}
