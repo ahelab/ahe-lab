@@ -307,6 +307,40 @@ h3 {
   margin-bottom: 18px;
 }
 
+.advanced-search {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.advanced-search label,
+.admin-panel label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.advanced-search input,
+.advanced-search select,
+.admin-panel textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+  padding: 10px 12px;
+}
+
+.selected-filter-line {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
 .database-toolbar span {
   font-weight: 800;
 }
@@ -542,6 +576,41 @@ h3 {
   margin-left: auto;
 }
 
+.favorite-button {
+  min-height: 44px;
+  margin-top: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-purple);
+  color: var(--color-white);
+  cursor: pointer;
+  font-weight: 900;
+  padding: 10px 14px;
+}
+
+.work-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  max-width: var(--max-width);
+  margin: 18px auto 0;
+}
+
+.work-nav a,
+.work-nav span {
+  min-height: 52px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-white);
+  font-weight: 900;
+}
+
+.work-nav a:last-child {
+  text-align: right;
+}
+
 .breadcrumb {
   display: flex;
   flex-wrap: wrap;
@@ -658,6 +727,62 @@ h3 {
 .stats-tags,
 .sitemap-grid {
   margin-top: 18px;
+}
+
+.stats-rankings {
+  margin-top: 18px;
+}
+
+.trend-panel,
+.admin-panel {
+  margin-top: 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.trend-chart {
+  display: grid;
+  gap: 10px;
+}
+
+.trend-row {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) 40px;
+  gap: 12px;
+  align-items: center;
+}
+
+.trend-row div {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.trend-row b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-purple);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: 16px;
+}
+
+.admin-panel textarea {
+  min-height: 300px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: none;
+}
+
+.import-result {
+  margin-bottom: 18px;
+  color: var(--color-muted);
 }
 
 .section-note {
@@ -1017,6 +1142,9 @@ h3 {
   .database-workspace,
   .detail-layout,
   .home-discovery,
+  .advanced-search,
+  .admin-grid,
+  .work-nav,
   .record-grid,
   .database-grid,
   .index-grid,

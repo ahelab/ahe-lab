@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AHE LAB admin import helper for validating and previewing JSON records.">
+  <meta property="og:title" content="Import Admin | AHE LAB">
+  <meta property="og:description" content="Validate, duplicate-check, and preview AHE LAB JSON records before adding them.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="admin/import.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Import Admin | AHE LAB">
+  <meta name="twitter:description" content="AHE LAB JSON import helper.">
+  <link rel="canonical" href="import.html">
+  <title>Import Admin | AHE LAB</title>
+  <link rel="stylesheet" href="../style.css?v=7">
+</head>
+<body class="database-page admin-page">
+  <header class="site-header">
+    <a class="brand" href="../index.html" aria-label="AHE LAB home">
+      <span class="brand-mark">A</span>
+      <span>
+        <strong>AHE LAB</strong>
+        <small>Import Helper</small>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="../index.html">Home</a>
+      <a href="../database.html">Database</a>
+      <a href="../stats.html">Stats</a>
+    </nav>
+  </header>
+
+  <main class="listing-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="../index.html">Home</a>
+      <span>/</span>
+      <strong>Import Admin</strong>
+    </nav>
+
+    <header class="detail-hero compact">
+      <p class="eyebrow">CMS Helper</p>
+      <h1>JSON Import</h1>
+      <p>新しいレコードJSONを貼り付けるだけで、入力チェック、重複チェック、プレビュー、結合後JSON出力を行います。</p>
+    </header>
+
+    <section class="admin-grid" aria-label="Import tools">
+      <div class="admin-panel">
+        <label for="import-json">Record JSON</label>
+        <textarea id="import-json" spellcheck="false" placeholder='{"id":"AHE-0021","title":"..."}'></textarea>
+        <div class="hero-actions">
+          <button class="button primary" id="validate-import" type="button">Validate</button>
+          <button class="button secondary" id="load-template" type="button">Load Template</button>
+        </div>
+      </div>
+
+      <div class="admin-panel">
+        <h2>Result</h2>
+        <div id="import-result" class="import-result">Paste JSON and validate.</div>
+        <h2>Preview</h2>
+        <div id="import-preview"></div>
+      </div>
+    </section>
+
+    <section class="admin-panel" aria-labelledby="merged-json-title">
+      <h2 id="merged-json-title">Merged JSON Output</h2>
+      <textarea id="merged-json" spellcheck="false" readonly></textarea>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 AHE LAB. Expression Archive Institute.</p>
+    <div>
+      <a href="../README.md">README</a>
+      <a href="../template.json">Template</a>
+      <a href="../schema/ahe-record.schema.json">Schema</a>
+    </div>
+  </footer>
+
+  <script src="import.js?v=7"></script>
+</body>
+</html>

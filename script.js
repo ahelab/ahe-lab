@@ -3,9 +3,17 @@ const DATA_PATH = "data/ahe-records.json";
 const databaseState = {
   query: "",
   activeTag: "all",
+  selectedTags: [],
+  tagMode: "and",
+  scoreMin: "",
+  scoreMax: "",
+  circle: "",
+  character: "",
   sortBy: "newest",
   records: []
 };
+
+const FAVORITE_KEY = "ahe-lab-favorites";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -56,6 +64,19 @@ function setMeta(title, description, canonical = getCurrentRelativeUrl()) {
   setTagAttribute('link[rel="canonical"]', "href", canonical);
 }
 
+function setJsonLd(data) {
+  let script = document.querySelector("#json-ld");
+
+  if (!script) {
+    script = document.createElement("script");
+    script.id = "json-ld";
+    script.type = "application/ld+json";
+    document.head.appendChild(script);
+  }
+
+  script.textContent = JSON.stringify(data);
+}
+
 function getRecordSearchText(record) {
   return normalize([
     record.id,
@@ -71,6 +92,32 @@ function getRecordSearchText(record) {
     ...record.characters,
     ...record.tags
   ].join(" "));
+}
+
+function getFavorites() {
+  try {
+    return JSON.parse(localStorage.getItem(FAVORITE_KEY)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function setFavorites(ids) {
+  localStorage.setItem(FAVORITE_KEY, JSON.stringify([...new Set(ids)]));
+}
+
+function isFavorite(id) {
+  return getFavorites().includes(id);
+}
+
+function toggleFavorite(id) {
+  const favorites = getFavorites();
+  const nextFavorites = favorites.includes(id)
+    ? favorites.filter((favoriteId) => favoriteId !== id)
+    : [...favorites, id];
+
+  setFavorites(nextFavorites);
+  return nextFavorites.includes(id);
 }
 
 function getAllTags(records) {
@@ -91,6 +138,10 @@ function getPopularTags(records, limit = 8) {
 
 function getPopularCircles(records, limit = 8) {
   return getPopularValues(records.map((record) => record.circle), limit);
+}
+
+function getPopularCharacters(records, limit = 8) {
+  return getPopularValues(records.flatMap((record) => record.characters), limit);
 }
 
 function getPopularValues(values, limit = 8) {
@@ -148,12 +199,24 @@ function sortRecords(records, sortBy) {
 
 function filterRecords(records, state) {
   const query = normalize(state.query);
+  const selectedTags = state.selectedTags || [];
+  const scoreMin = state.scoreMin === "" ? 0 : Number(state.scoreMin);
+  const scoreMax = state.scoreMax === "" ? 100 : Number(state.scoreMax);
+  const selectedCircle = normalize(state.circle);
+  const selectedCharacter = normalize(state.character);
 
   return records.filter((record) => {
     const matchesSearch = !query || getRecordSearchText(record).includes(query);
-    const matchesTag = state.activeTag === "all" || record.tags.includes(state.activeTag);
+    const matchesLegacyTag = state.activeTag === "all" || record.tags.includes(state.activeTag);
+    const matchesTags = selectedTags.length === 0
+      || (state.tagMode === "or"
+        ? selectedTags.some((tag) => record.tags.includes(tag))
+        : selectedTags.every((tag) => record.tags.includes(tag)));
+    const matchesScore = record.score >= scoreMin && record.score <= scoreMax;
+    const matchesCircle = !selectedCircle || normalize(record.circle).includes(selectedCircle);
+    const matchesCharacter = !selectedCharacter || record.characters.some((character) => normalize(character).includes(selectedCharacter));
 
-    return matchesSearch && matchesTag;
+    return matchesSearch && matchesLegacyTag && matchesTags && matchesScore && matchesCircle && matchesCharacter;
   });
 }
 
@@ -388,6 +451,13 @@ function renderDatabasePage(records) {
     "Database | AHE LAB",
     "Search the AHE LAB static database by title, tag, circle, character, and AHE SCORE."
   );
+  setJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "AHE LAB Database",
+    "description": "Searchable JSON-powered archive records.",
+    "numberOfItems": records.length
+  });
 
   const app = document.querySelector("#app");
   const average = Math.round(records.reduce((sum, record) => sum + record.score, 0) / records.length);
@@ -433,6 +503,34 @@ function renderDatabasePage(records) {
             <button type="reset" id="db-clear-search">Clear</button>
           </form>
 
+          <div class="advanced-search" aria-label="Advanced search filters">
+            <label>
+              <span>Tag Mode</span>
+              <select id="db-tag-mode">
+                <option value="and">AND</option>
+                <option value="or">OR</option>
+              </select>
+            </label>
+            <label>
+              <span>Score Min</span>
+              <input id="db-score-min" type="number" min="0" max="100" placeholder="0">
+            </label>
+            <label>
+              <span>Score Max</span>
+              <input id="db-score-max" type="number" min="0" max="100" placeholder="100">
+            </label>
+            <label>
+              <span>Circle</span>
+              <input id="db-circle-filter" type="search" placeholder="Circle name">
+            </label>
+            <label>
+              <span>Character</span>
+              <input id="db-character-filter" type="search" placeholder="Character name">
+            </label>
+          </div>
+
+          <p class="selected-filter-line" id="db-selected-tags">Selected tags: all</p>
+
           <div class="database-toolbar database-page-toolbar" aria-live="polite">
             <span id="db-result-count">0 records</span>
             <label>
@@ -460,12 +558,19 @@ function renderDatabasePage(records) {
   const resultCount = document.querySelector("#db-result-count");
   const activeFilter = document.querySelector("#db-active-filter");
   const sortRecordsInput = document.querySelector("#db-sort-records");
+  const tagModeInput = document.querySelector("#db-tag-mode");
+  const scoreMinInput = document.querySelector("#db-score-min");
+  const scoreMaxInput = document.querySelector("#db-score-max");
+  const circleFilterInput = document.querySelector("#db-circle-filter");
+  const characterFilterInput = document.querySelector("#db-character-filter");
+  const selectedTagsLine = document.querySelector("#db-selected-tags");
 
   function renderDatabaseRecords() {
     const filteredRecords = sortRecords(filterRecords(databaseState.records, databaseState), databaseState.sortBy);
 
     resultCount.textContent = `${filteredRecords.length} records`;
-    activeFilter.textContent = databaseState.activeTag === "all" ? "All" : databaseState.activeTag;
+    activeFilter.textContent = databaseState.selectedTags.length ? databaseState.selectedTags.join(", ") : "All";
+    selectedTagsLine.textContent = `Selected tags: ${databaseState.selectedTags.length ? databaseState.selectedTags.join(", ") : "all"}`;
     grid.innerHTML = renderRecordGrid(filteredRecords);
   }
 
@@ -473,7 +578,7 @@ function renderDatabasePage(records) {
     const tags = getAllTags(databaseState.records);
 
     tagCloud.innerHTML = tags.map((tag) => `
-      <button class="tag-button${tag === databaseState.activeTag ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+      <button class="tag-button${databaseState.selectedTags.includes(tag) || (tag === "all" && databaseState.selectedTags.length === 0) ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
         ${escapeHtml(tag)}
       </button>
     `).join("");
@@ -498,6 +603,21 @@ function renderDatabasePage(records) {
     renderDatabaseRecords();
   });
 
+  tagModeInput.addEventListener("change", (event) => {
+    databaseState.tagMode = event.target.value;
+    renderDatabaseRecords();
+  });
+
+  [scoreMinInput, scoreMaxInput, circleFilterInput, characterFilterInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      databaseState.scoreMin = scoreMinInput.value;
+      databaseState.scoreMax = scoreMaxInput.value;
+      databaseState.circle = circleFilterInput.value;
+      databaseState.character = characterFilterInput.value;
+      renderDatabaseRecords();
+    });
+  });
+
   tagCloud.addEventListener("click", (event) => {
     const tagButton = event.target.closest("[data-tag]");
 
@@ -505,7 +625,17 @@ function renderDatabasePage(records) {
       return;
     }
 
-    databaseState.activeTag = tagButton.dataset.tag;
+    const tag = tagButton.dataset.tag;
+
+    if (tag === "all") {
+      databaseState.selectedTags = [];
+      databaseState.activeTag = "all";
+    } else if (databaseState.selectedTags.includes(tag)) {
+      databaseState.selectedTags = databaseState.selectedTags.filter((selectedTag) => selectedTag !== tag);
+    } else {
+      databaseState.selectedTags = [...databaseState.selectedTags, tag];
+    }
+
     renderDatabaseTags();
     renderDatabaseRecords();
   });
@@ -516,6 +646,10 @@ function renderWorkPage(records) {
   const record = records.find((item) => item.id === id);
   const app = document.querySelector("#app");
   const relatedRecords = record ? getRelatedRecords(records, record) : [];
+  const orderedRecords = sortRecords(records, "newest");
+  const currentIndex = orderedRecords.findIndex((item) => item.id === id);
+  const previousRecord = orderedRecords[currentIndex - 1];
+  const nextRecord = orderedRecords[currentIndex + 1];
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -527,6 +661,23 @@ function renderWorkPage(records) {
     `${record.title} | AHE LAB`,
     `${record.title} record with AHE SCORE ${record.score}, circle ${record.circle}, and archive classification tags.`
   );
+  setJsonLd({
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "identifier": record.id,
+    "name": record.title,
+    "datePublished": record.publishedAt,
+    "genre": record.tags,
+    "creator": record.circle,
+    "character": record.characters,
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": record.score,
+      "bestRating": 100,
+      "worstRating": 0,
+      "ratingCount": 1
+    }
+  });
 
   app.innerHTML = `
     <article class="detail-page" aria-labelledby="work-title">
@@ -536,7 +687,15 @@ function renderWorkPage(records) {
         <p class="eyebrow">Work Detail / ${escapeHtml(record.id)}</p>
         <h1 id="work-title">${escapeHtml(record.title)}</h1>
         <p>${escapeHtml(record.note)}</p>
+        <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
+          ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
+        </button>
       </header>
+
+      <nav class="work-nav" aria-label="Previous and next works">
+        ${previousRecord ? `<a href="work.html?id=${encodeParam(previousRecord.id)}">← ${escapeHtml(previousRecord.title)}</a>` : "<span></span>"}
+        ${nextRecord ? `<a href="work.html?id=${encodeParam(nextRecord.id)}">${escapeHtml(nextRecord.title)} →</a>` : "<span></span>"}
+      </nav>
 
       <section class="detail-layout" aria-label="Work metadata">
         <div class="detail-score">
@@ -573,6 +732,11 @@ function renderWorkPage(records) {
       </section>
     </article>
   `;
+
+  document.querySelector("#favorite-button").addEventListener("click", (event) => {
+    const favorite = toggleFavorite(event.currentTarget.dataset.id);
+    event.currentTarget.textContent = favorite ? "Remove Favorite" : "Add Favorite";
+  });
 }
 
 function renderListingPage(records, type) {
@@ -730,6 +894,18 @@ function renderStatsPage(records) {
   const app = document.querySelector("#app");
   const averageScore = Math.round(records.reduce((sum, record) => sum + record.score, 0) / records.length);
   const topTags = getPopularTags(records, 12);
+  const topCircles = getPopularCircles(records, 10);
+  const topCharacters = getPopularCharacters(records, 10);
+  const yearlyCounts = getYearlyCounts(records);
+  const maxYearCount = Math.max(...yearlyCounts.map((item) => item.count));
+  setJsonLd({
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    "name": "AHE LAB Archive Stats",
+    "description": "Aggregated statistics generated from the AHE LAB JSON archive.",
+    "measurementTechnique": "Static JSON aggregation",
+    "variableMeasured": ["works", "tags", "circles", "characters", "average AHE SCORE"]
+  });
 
   app.innerHTML = `
     <section class="listing-page stats-page" aria-labelledby="stats-title">
@@ -762,8 +938,55 @@ function renderStatsPage(records) {
           `).join("")}
         </ol>
       </section>
+
+      <div class="ranking-grid stats-rankings">
+        ${renderValueRanking("Circle Ranking", topCircles, "circle")}
+        ${renderValueRanking("Character Ranking", topCharacters, "character")}
+      </div>
+
+      <section class="trend-panel" aria-labelledby="trend-title">
+        <h2 id="trend-title">Works Added Trend</h2>
+        <div class="trend-chart">
+          ${yearlyCounts.map((item) => `
+            <div class="trend-row">
+              <span>${item.year}</span>
+              <div><b style="width:${Math.max(8, Math.round((item.count / maxYearCount) * 100))}%"></b></div>
+              <strong>${item.count}</strong>
+            </div>
+          `).join("")}
+        </div>
+      </section>
     </section>
   `;
+}
+
+function renderValueRanking(title, values, type) {
+  return `
+    <section class="ranking-list" aria-label="${escapeHtml(title)}">
+      <h2>${escapeHtml(title)}</h2>
+      <ol>
+        ${values.map((item) => `
+          <li>
+            <a href="${type}.html?name=${encodeParam(item.name)}">
+              <strong>${escapeHtml(item.name)}</strong>
+              <span>${item.count} works</span>
+            </a>
+          </li>
+        `).join("")}
+      </ol>
+    </section>
+  `;
+}
+
+function getYearlyCounts(records) {
+  const counts = records.reduce((accumulator, record) => {
+    accumulator[record.year] = (accumulator[record.year] || 0) + 1;
+    return accumulator;
+  }, {});
+
+  return Object.entries(counts)
+    .map(([year, count]) => ({ year, count }))
+    .sort((a, b) => Number(a.year) - Number(b.year));
 }
 
 function renderStatCard(label, value) {
@@ -786,6 +1009,8 @@ function getGeneratedUrls(records) {
     "circle.html",
     "character.html",
     "sitemap.html",
+    "admin/import.html",
+    "rss.xml",
     "404.html",
     ...records.map((record) => `work.html?id=${encodeParam(record.id)}`),
     ...getAllTags(records).filter((tag) => tag !== "all").map((tag) => `tag.html?name=${encodeParam(tag)}`),
@@ -803,6 +1028,12 @@ function renderSitemapPage(records) {
 
   const app = document.querySelector("#app");
   const urls = getGeneratedUrls(records);
+  setJsonLd({
+    "@context": "https://schema.org",
+    "@type": "SiteNavigationElement",
+    "name": "AHE LAB generated sitemap",
+    "url": urls
+  });
 
   app.innerHTML = `
     <section class="listing-page sitemap-page" aria-labelledby="sitemap-title">
