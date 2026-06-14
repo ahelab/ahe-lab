@@ -167,6 +167,62 @@
           "maximum": 100
         }
       },
+      "rating": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "eyeFocus": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "tongueOut": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "drool": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "doublePeace": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "tearsPien": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "pleasure": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "despairFear": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "loyaltySubmission": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "expressionDuration": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "workConcept": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10
+          }
+        }
+      },
       "tagCategories": {
         "type": "object",
         "minProperties": 1,

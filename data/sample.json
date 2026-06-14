@@ -39,6 +39,18 @@
     "context": 80,
     "archive-value": 80
   },
+  "rating": {
+    "eyeFocus": 8,
+    "tongueOut": 8,
+    "drool": 8,
+    "doublePeace": 8,
+    "tearsPien": 8,
+    "pleasure": 8,
+    "despairFear": 8,
+    "loyaltySubmission": 8,
+    "expressionDuration": 8,
+    "workConcept": 8
+  },
   "tagCategories": {
     "expression": [
       "archive-first"
