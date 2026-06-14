@@ -362,6 +362,82 @@ function renderRecordGrid(records) {
   return records.map((record) => renderRecordCard(record, "database")).join("");
 }
 
+function getRecordPerformers(record) {
+  return record.performers || record.characters;
+}
+
+function getRecordMaker(record) {
+  return record.maker || record.metadata?.maker || record.circle;
+}
+
+function getRecordRelease(record) {
+  return record.release || record.publishedAt;
+}
+
+function getRecordRuntime(record) {
+  return record.runtime || record.metadata?.runtime || "Unrecorded";
+}
+
+function getRecordArchiveNote(record) {
+  return record.archiveNote || record.note;
+}
+
+function renderMetaItem(label, value, href = "") {
+  const displayValue = value == null || value === "" ? "Unrecorded" : value;
+
+  return `
+    <div>
+      <dt>${escapeHtml(label)}</dt>
+      <dd>${href ? `<a href="${href}">${escapeHtml(displayValue)}</a>` : escapeHtml(displayValue)}</dd>
+    </div>
+  `;
+}
+
+function renderScoreDetails(record) {
+  const entries = Object.entries(record.scoreDetails || {});
+  const rows = entries.length > 0 ? entries : [["overall", record.score]];
+
+  return rows.map(([label, value]) => `
+    <div>
+      <dt>${escapeHtml(label.replaceAll("-", " "))}</dt>
+      <dd>${escapeHtml(value)}</dd>
+    </div>
+  `).join("");
+}
+
+function renderMetadataRows(record) {
+  const metadata = record.metadata || {};
+  const baseRows = [
+    ["Record ID", record.id],
+    ["Product ID", metadata.productId],
+    ["Label", record.label || metadata.label],
+    ["Verification", record.verification || metadata.verification],
+    ["Medium", record.medium],
+    ["Year", record.year],
+    ["Status", record.status]
+  ];
+  const reservedKeys = new Set(["productId", "label", "verification", "maker", "runtime"]);
+  const customRows = Object.entries(metadata)
+    .filter(([key]) => !reservedKeys.has(key))
+    .map(([key, value]) => [key, value]);
+
+  return [...baseRows, ...customRows]
+    .filter(([, value]) => value != null && value !== "")
+    .map(([label, value]) => renderMetaItem(label, value))
+    .join("");
+}
+
+function renderCategorizedTags(record) {
+  const categories = record.tagCategories || { general: record.tags };
+
+  return Object.entries(categories).map(([category, tags]) => `
+    <section class="tag-category" aria-label="${escapeHtml(category)} tags">
+      <h3>${escapeHtml(category.replaceAll("-", " "))}</h3>
+      <div class="record-tags">${renderTagLinks(tags)}</div>
+    </section>
+  `).join("");
+}
+
 // Page renderers.
 function renderHomePreview(records) {
   const previewRecords = sortRecords(records, "score").slice(0, 4);
@@ -659,6 +735,10 @@ function renderWorkPage(records) {
   const currentIndex = orderedRecords.findIndex((item) => item.id === id);
   const previousRecord = orderedRecords[currentIndex - 1];
   const nextRecord = orderedRecords[currentIndex + 1];
+  const performers = record ? getRecordPerformers(record) : [];
+  const maker = record ? getRecordMaker(record) : "";
+  const release = record ? getRecordRelease(record) : "";
+  const archiveNote = record ? getRecordArchiveNote(record) : "";
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -668,17 +748,18 @@ function renderWorkPage(records) {
 
   setMeta(
     `${record.title} | AHE LAB`,
-    `${record.title} record with AHE SCORE ${record.score}, circle ${record.circle}, and archive classification tags.`
+    `${record.title} record with AHE SCORE ${record.score}, maker ${maker}, and archive classification tags.`
   );
   setJsonLd({
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     "identifier": record.id,
     "name": record.title,
-    "datePublished": record.publishedAt,
+    "datePublished": release,
     "genre": record.tags,
-    "creator": record.circle,
+    "creator": maker,
     "character": record.characters,
+    "actor": performers,
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": record.score,
@@ -695,7 +776,7 @@ function renderWorkPage(records) {
       <header class="detail-hero">
         <p class="eyebrow">Work Detail / ${escapeHtml(record.id)}</p>
         <h1 id="work-title">${escapeHtml(record.title)}</h1>
-        <p>${escapeHtml(record.note)}</p>
+        <p>${escapeHtml(archiveNote)}</p>
         <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
           ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
         </button>
@@ -713,13 +794,39 @@ function renderWorkPage(records) {
         </div>
 
         <dl class="detail-meta">
-          <div><dt>Medium</dt><dd>${escapeHtml(record.medium)}</dd></div>
-          <div><dt>Year</dt><dd>${escapeHtml(record.year)}</dd></div>
-          <div><dt>Published</dt><dd>${escapeHtml(record.publishedAt)}</dd></div>
-          <div><dt>Intensity</dt><dd>${escapeHtml(record.intensity)}</dd></div>
-          <div><dt>Status</dt><dd>${escapeHtml(record.status)}</dd></div>
-          <div><dt>Circle</dt><dd><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></dd></div>
+          ${renderMetaItem("Performer", performers.join(", "))}
+          ${renderMetaItem("Maker", maker, `circle.html?name=${encodeParam(record.circle)}`)}
+          ${renderMetaItem("Release", release)}
+          ${renderMetaItem("Runtime", getRecordRuntime(record))}
+          ${renderMetaItem("Intensity", record.intensity)}
+          ${renderMetaItem("Circle", record.circle, `circle.html?name=${encodeParam(record.circle)}`)}
         </dl>
+      </section>
+
+      <section class="detail-section" aria-labelledby="score-detail-title">
+        <h2 id="score-detail-title">AHE Score Detail</h2>
+        <dl class="detail-meta score-breakdown">
+          ${renderScoreDetails(record)}
+        </dl>
+      </section>
+
+      <section class="detail-section" aria-labelledby="metadata-title">
+        <h2 id="metadata-title">Metadata</h2>
+        <dl class="detail-meta metadata-grid">
+          ${renderMetadataRows(record)}
+        </dl>
+      </section>
+
+      <section class="detail-section note-grid" aria-labelledby="notes-title">
+        <h2 id="notes-title">Research Notes</h2>
+        <article>
+          <h3>Archive Note</h3>
+          <p>${escapeHtml(archiveNote)}</p>
+        </article>
+        <article>
+          <h3>Reviewer Note</h3>
+          <p>${escapeHtml(record.reviewerNote || "No reviewer note recorded.")}</p>
+        </article>
       </section>
 
       <section class="detail-section" aria-labelledby="characters-title">
@@ -729,7 +836,9 @@ function renderWorkPage(records) {
 
       <section class="detail-section" aria-labelledby="tags-title">
         <h2 id="tags-title">Tags</h2>
-        <div class="record-tags">${renderTagLinks(record.tags)}</div>
+        <div class="tag-category-grid">
+          ${renderCategorizedTags(record)}
+        </div>
       </section>
 
       <section class="detail-section" aria-labelledby="related-title">
