@@ -56,7 +56,7 @@
   "communityReviews": [
     {
       "nickname": "AHELAB",
-      "role": "Curator Review",
+      "role": "Curator",
       "createdAt": "2026-06-14",
       "rating": {
         "eyeFocus": 8,
@@ -72,6 +72,13 @@
       },
       "comment": "立ち上げ初期のサンプルレビューとして登録。",
       "helpfulCount": 0
+    }
+  ],
+  "externalLinks": [
+    {
+      "label": "Official",
+      "url": "https://example.com",
+      "note": "Official reference page"
     }
   ],
   "tagCategories": {

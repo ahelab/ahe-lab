@@ -604,6 +604,30 @@ function renderReviewRatingList(review) {
   `;
 }
 
+function renderExternalLinks(record) {
+  const links = Array.isArray(record.externalLinks) ? record.externalLinks : [];
+  const placeholderLinks = ["FANZA", "DMM", "Official"];
+
+  return `
+    <section class="detail-section" aria-labelledby="external-links-title">
+      <h2 id="external-links-title">External Links</h2>
+      <div class="external-link-grid">
+        ${links.length > 0 ? links.map((link) => `
+          <a href="${escapeHtml(link.url)}" rel="noopener" target="_blank">
+            <strong>${escapeHtml(link.label)}</strong>
+            <span>${escapeHtml(link.note || "External reference")}</span>
+          </a>
+        `).join("") : placeholderLinks.map((label) => `
+          <span>
+            <strong>${escapeHtml(label)}</strong>
+            <small>Not recorded yet</small>
+          </span>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderCommunityReviews(record) {
   const reviews = getCommunityReviews(record);
 
@@ -623,6 +647,7 @@ function renderCommunityReviews(record) {
               <time datetime="${escapeHtml(review.createdAt)}">${escapeHtml(review.createdAt)}</time>
             </header>
             <p class="review-score">AHE Score: ${score === null ? "未評価" : `${escapeHtml(score)}/100`}</p>
+            ${renderReviewRatingList(review)}
             <div class="review-comment">
               <h4>Comment</h4>
               <p>${escapeHtml(review.comment || "No comment recorded.")}</p>
@@ -999,6 +1024,11 @@ function renderWorkPage(records) {
   const productId = metadata.productId || "Unrecorded";
   const communityReviews = record ? getCommunityReviews(record) : [];
   const communityScore = getCommunityScore(communityReviews);
+  const thumbnail = record.thumbnail || {
+    label: record.id,
+    accent: "#7C5CFF",
+    background: "#111115"
+  };
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -1033,21 +1063,32 @@ function renderWorkPage(records) {
     <article class="detail-page" aria-labelledby="work-title">
       ${renderBackButton("database.html", "Back to Database")}
       ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
-      <header class="detail-hero">
-        <p class="eyebrow">Work Header / ${escapeHtml(record.id)}</p>
-        <h1 id="work-title">${escapeHtml(record.title)}</h1>
-        <dl class="work-header-meta">
-          ${renderMetaItem("Product ID", productId)}
-          ${renderMetaItem("Performer", performers.join(", "))}
-          ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
-          ${renderMetaItem("Release", release)}
-          ${renderMetaItem("Runtime", getRecordRuntime(record))}
-          ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
-        </dl>
-        <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
-        <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
-          ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
-        </button>
+      <header class="work-overview" aria-labelledby="work-title">
+        <div class="work-cover-placeholder" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
+          <span>${escapeHtml(thumbnail.label || record.id)}</span>
+          <small>Cover Image</small>
+        </div>
+        <div class="work-overview-body">
+          <p class="eyebrow">Community Archive / ${escapeHtml(record.id)}</p>
+          <h1 id="work-title">${escapeHtml(record.title)}</h1>
+          <div class="work-community-score">
+            <span>Community Score</span>
+            <strong>${communityScore === null ? "No community score yet" : `${escapeHtml(communityScore)}/100`}</strong>
+            ${communityScore === null ? "" : `<small>Based on ${escapeHtml(communityReviews.length)} community review${communityReviews.length === 1 ? "" : "s"}</small>`}
+          </div>
+          <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
+          <dl class="work-header-meta">
+            ${renderMetaItem("Product ID", productId)}
+            ${renderMetaItem("Performer", performers.join(", "))}
+            ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
+            ${renderMetaItem("Release", release)}
+            ${renderMetaItem("Runtime", getRecordRuntime(record))}
+            ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
+          </dl>
+          <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
+            ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
+          </button>
+        </div>
       </header>
 
       <nav class="work-nav" aria-label="Previous and next works">
@@ -1067,6 +1108,7 @@ function renderWorkPage(records) {
 
       ${renderCommunityReviews(record)}
       ${renderOfficialArchiveNote(record)}
+      ${renderExternalLinks(record)}
 
       <section class="detail-section" aria-labelledby="related-title">
         <h2 id="related-title">Related Works</h2>
