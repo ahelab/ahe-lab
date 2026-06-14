@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>AHE LAB</title>
+    <link>index.html</link>
+    <description>Expression Archive Institute updates generated from JSON.</description>
+    <item>
+      <title>Database Launch Sample Set</title>
+      <link>work.html?id=AHE-0020</link>
+      <guid>AHE-0020</guid>
+      <pubDate>Sun, 14 Jun 2026 00:00:00 GMT</pubDate>
+      <description>Phase2 Databaseページ公開用の20件目サンプルレコード。</description>
+    </item>
+    <item>
+      <title>Cataloging Rule Prototype</title>
+      <link>work.html?id=AHE-0019</link>
+      <guid>AHE-0019</guid>
+      <pubDate>Sat, 13 Jun 2026 00:00:00 GMT</pubDate>
+      <description>登録ルール、スコア、タグ粒度を検証するためのプロトタイプ。</description>
+    </item>
+    <item>
+      <title>Purple Archive UI Sample</title>
+      <link>work.html?id=AHE-0015</link>
+      <guid>AHE-0015</guid>
+      <pubDate>Fri, 12 Jun 2026 00:00:00 GMT</pubDate>
+      <description>AHE LABの画面設計とアーカイブ体験を評価するUI用レコード。</description>
+    </item>
+    <item>
+      <title>Archive First Manifest Record</title>
+      <link>work.html?id=AHE-0009</link>
+      <guid>AHE-0009</guid>
+      <pubDate>Wed, 10 Jun 2026 00:00:00 GMT</pubDate>
+      <description>AHE LABの思想とデータベース方針を結びつける中核メモ。</description>
+    </item>
+    <item>
+      <title>Expression Taxonomy Draft</title>
+      <link>work.html?id=AHE-0004</link>
+      <guid>AHE-0004</guid>
+      <pubDate>Mon, 08 Jun 2026 00:00:00 GMT</pubDate>
+      <description>AHE LABの分類体系を検証するための研究ノート型レコード。</description>
+    </item>
+    <item>
+      <title>Score Calibration Reference</title>
+      <link>work.html?id=AHE-0016</link>
+      <guid>AHE-0016</guid>
+      <pubDate>Mon, 01 Dec 2025 00:00:00 GMT</pubDate>
+      <description>AHE SCOREを主観評価だけにしないための基準点。</description>
+    </item>
+    <item>
+      <title>Short Form Video Reference</title>
+      <link>work.html?id=AHE-0018</link>
+      <guid>AHE-0018</guid>
+      <pubDate>Fri, 16 Aug 2024 00:00:00 GMT</pubDate>
+      <description>短尺動画プラットフォームでの表現変換を調査するための記録。</description>
+    </item>
+    <item>
+      <title>Classic Motif Reappearance</title>
+      <link>work.html?id=AHE-0017</link>
+      <guid>AHE-0017</guid>
+      <pubDate>Sun, 09 Apr 2023 00:00:00 GMT</pubDate>
+      <description>古典的モチーフが新しい絵柄で再出現する例を記録。</description>
+    </item>
+    <item>
+      <title>Scene Context Classification</title>
+      <link>work.html?id=AHE-0014</link>
+      <guid>AHE-0014</guid>
+      <pubDate>Fri, 24 Jun 2022 00:00:00 GMT</pubDate>
+      <description>単体表情ではなく前後文脈を含めた分類テスト。</description>
+    </item>
+    <item>
+      <title>Derivative Tag Drift Study</title>
+      <link>work.html?id=AHE-0013</link>
+      <guid>AHE-0013</guid>
+      <pubDate>Thu, 11 Mar 2021 00:00:00 GMT</pubDate>
+      <description>派生投稿によってタグの意味が変化する現象を追跡。</description>
+    </item>
+    <item>
+      <title>Digital Meme Circulation Note</title>
+      <link>work.html?id=AHE-0003</link>
+      <guid>AHE-0003</guid>
+      <pubDate>Thu, 19 Nov 2020 00:00:00 GMT</pubDate>
+      <description>SNS上での二次流通とタグ変化を追跡するためのサンプル。</description>
+    </item>
+    <item>
+      <title>Character Pose Metadata Test</title>
+      <link>work.html?id=AHE-0008</link>
+      <guid>AHE-0008</guid>
+      <pubDate>Wed, 22 May 2019 00:00:00 GMT</pubDate>
+      <description>キャラクター姿勢と表情タグを分離して管理するための試験データ。</description>
+    </item>
+    <item>
+      <title>Panel Rhythm Comparative Record</title>
+      <link>work.html?id=AHE-0006</link>
+      <guid>AHE-0006</guid>
+      <pubDate>Sat, 15 Sep 2018 00:00:00 GMT</pubDate>
+      <description>ページ内のリズムと表情の段階変化を比較対象として記録。</description>
+    </item>
+    <item>
+      <title>High Contrast Cover Motif</title>
+      <link>work.html?id=AHE-0010</link>
+      <guid>AHE-0010</guid>
+      <pubDate>Mon, 30 Jan 2017 00:00:00 GMT</pubDate>
+      <description>表紙構図におけるコントラストと視認性を評価するレコード。</description>
+    </item>
+    <item>
+      <title>Lens Gaze Archive Sample</title>
+      <link>work.html?id=AHE-0002</link>
+      <guid>AHE-0002</guid>
+      <pubDate>Wed, 03 Aug 2016 00:00:00 GMT</pubDate>
+      <description>視線方向とコマ配置が表現の強度に与える影響を記録。</description>
+    </item>
+    <item>
+      <title>Animated Expression Timing</title>
+      <link>work.html?id=AHE-0011</link>
+      <guid>AHE-0011</guid>
+      <pubDate>Sat, 18 Jul 2015 00:00:00 GMT</pubDate>
+      <description>表情変化のタイミングを静止画資料とは別軸で分類。</description>
+    </item>
+    <item>
+      <title>Iconic Face Symbol Index</title>
+      <link>work.html?id=AHE-0005</link>
+      <guid>AHE-0005</guid>
+      <pubDate>Thu, 27 Feb 2014 00:00:00 GMT</pubDate>
+      <description>記号化された表情要素を、線、目線、口元の3軸で整理。</description>
+    </item>
+    <item>
+      <title>Minimal Line Expression Note</title>
+      <link>work.html?id=AHE-0012</link>
+      <guid>AHE-0012</guid>
+      <pubDate>Sat, 05 Oct 2013 00:00:00 GMT</pubDate>
+      <description>少ない線で成立する表現記号を、簡略化の観点から保存。</description>
+    </item>
+    <item>
+      <title>Double Peace Expression Study</title>
+      <link>work.html?id=AHE-0001</link>
+      <guid>AHE-0001</guid>
+      <pubDate>Thu, 12 Apr 2012 00:00:00 GMT</pubDate>
+      <description>初期インターネット文化で広く参照される構図を分類した基礎レコード。</description>
+    </item>
+    <item>
+      <title>Early Web Board Reference</title>
+      <link>work.html?id=AHE-0007</link>
+      <guid>AHE-0007</guid>
+      <pubDate>Wed, 02 Dec 2009 00:00:00 GMT</pubDate>
+      <description>掲示板文化における語彙の定着過程を追うための参照レコード。</description>
+    </item>
+  </channel>
+</rss>

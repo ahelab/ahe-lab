@@ -1,0 +1,24 @@
+{
+  "id": "AHE-0021",
+  "title": "New Archive Record Title",
+  "medium": "Illustration",
+  "year": 2026,
+  "publishedAt": "2026-06-14",
+  "score": 80,
+  "intensity": "Medium",
+  "status": "Draft",
+  "tags": [
+    "archive-first",
+    "sample-tag"
+  ],
+  "note": "この作品の分類メモを記入します。",
+  "circle": "New Circle Name",
+  "characters": [
+    "New Character Name"
+  ],
+  "thumbnail": {
+    "label": "#0021",
+    "accent": "#7C5CFF",
+    "background": "#111115"
+  }
+}
