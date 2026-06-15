@@ -196,6 +196,36 @@ function getRelatedRecords(records, currentRecord, limit = 6) {
     .map((item) => item.record);
 }
 
+function getRecordCommunityScore(record) {
+  return getCommunityScore(getCommunityReviews(record));
+}
+
+function getRecordReviewCount(record) {
+  return getCommunityReviews(record).length;
+}
+
+function getAverageCommunityScore(records) {
+  const scores = records.map(getRecordCommunityScore).filter((score) => score !== null);
+
+  return scores.length
+    ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length)
+    : null;
+}
+
+function sortByCommunityScore(records) {
+  return [...records].sort((a, b) => (getRecordCommunityScore(b) ?? -1) - (getRecordCommunityScore(a) ?? -1));
+}
+
+function getRecordTimeline(records) {
+  const counts = records.reduce((accumulator, record) => {
+    const year = record.year || new Date(record.publishedAt).getFullYear() || "Unknown";
+    accumulator[year] = (accumulator[year] || 0) + 1;
+    return accumulator;
+  }, {});
+
+  return Object.entries(counts).sort((a, b) => Number(b[0]) - Number(a[0]));
+}
+
 // Sorting and filtering are shared by Home preview, Database, and generated listing pages.
 function sortRecords(records, sortBy) {
   return [...records].sort((a, b) => {
@@ -322,6 +352,23 @@ function renderEntityLinks(values, page) {
   `).join("");
 }
 
+function renderCountedLinks(values, page) {
+  if (values.length === 0) {
+    return '<p class="empty-state">No connected records yet.</p>';
+  }
+
+  return `
+    <div class="entity-link-list">
+      ${values.map((value) => `
+        <a href="${page}.html?name=${encodeParam(value.name)}">
+          <strong>${escapeHtml(value.name)}</strong>
+          <span>${escapeHtml(value.count)} works</span>
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderTagLinks(tags) {
   return tags.map((tag) => `
     <a href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
@@ -334,12 +381,16 @@ function renderRecordCard(record, variant = "database") {
     accent: "#7C5CFF",
     background: "#111115"
   };
+  const performers = getRecordPerformers(record);
+  const communityScore = getRecordCommunityScore(record);
+  const reviewCount = getRecordReviewCount(record);
+  const release = getRecordRelease(record);
   const detailMarkup = variant === "database"
     ? `
       <dl class="record-details">
-        <div><dt>Published</dt><dd>${escapeHtml(record.publishedAt)}</dd></div>
+        <div><dt>Release</dt><dd>${escapeHtml(release)}</dd></div>
+        <div><dt>Reviews</dt><dd>${escapeHtml(reviewCount)}</dd></div>
         <div><dt>Circle</dt><dd><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></dd></div>
-        <div><dt>Status</dt><dd>${escapeHtml(record.status)}</dd></div>
       </dl>
     `
     : "";
@@ -349,16 +400,20 @@ function renderRecordCard(record, variant = "database") {
       <a class="record-poster record-link" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
         <span class="record-code">${escapeHtml(thumbnail.label || record.id)}</span>
         <span class="record-thumb-title">${escapeHtml(record.medium)}</span>
-        <span class="record-score" aria-label="AHE SCORE ${escapeHtml(record.score)}">${escapeHtml(record.score)}</span>
+        <span class="record-score" aria-label="Community Score ${communityScore === null ? "not rated" : escapeHtml(communityScore)}">${communityScore === null ? "NR" : escapeHtml(communityScore)}</span>
       </a>
       <div class="record-body">
-        <p class="record-meta">${escapeHtml(record.medium)} / ${escapeHtml(record.year)}</p>
+        <p class="record-meta">${escapeHtml(record.medium)} / ${escapeHtml(record.year)} / ${escapeHtml(release)}</p>
         <h3><a href="work.html?id=${encodeParam(record.id)}">${escapeHtml(record.title)}</a></h3>
         <p class="record-circle"><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></p>
+        <p class="record-statline">
+          <strong>Community Score ${communityScore === null ? "No score" : `${escapeHtml(communityScore)}/100`}</strong>
+          <span>${escapeHtml(reviewCount)} review${reviewCount === 1 ? "" : "s"}</span>
+        </p>
         <p class="record-note">${escapeHtml(record.note)}</p>
         ${detailMarkup}
-        <div class="entity-links" aria-label="Characters">
-          ${renderEntityLinks(record.characters, "character")}
+        <div class="entity-links" aria-label="Performers">
+          ${renderEntityLinks(performers, "character")}
         </div>
         <div class="record-tags">
           ${renderTagLinks(record.tags)}
@@ -702,6 +757,221 @@ function renderOfficialArchiveNote(record) {
   `;
 }
 
+function renderTimeline(records) {
+  const timeline = getRecordTimeline(records);
+
+  if (timeline.length === 0) {
+    return '<p class="empty-state">No timeline data yet.</p>';
+  }
+
+  return `
+    <ol class="timeline-list">
+      ${timeline.map(([year, count]) => `
+        <li>
+          <strong>${escapeHtml(year)}</strong>
+          <span>${escapeHtml(count)} work${count === 1 ? "" : "s"}</span>
+        </li>
+      `).join("")}
+    </ol>
+  `;
+}
+
+function renderCompactWorkList(records) {
+  if (records.length === 0) {
+    return '<p class="empty-state">No connected works yet.</p>';
+  }
+
+  return `
+    <div class="compact-work-list">
+      ${records.map((record) => {
+        const communityScore = getRecordCommunityScore(record);
+
+        return `
+          <a href="work.html?id=${encodeParam(record.id)}">
+            <strong>${escapeHtml(record.title)}</strong>
+            <span>${communityScore === null ? "No score" : `${escapeHtml(communityScore)}/100`} / ${escapeHtml(getRecordRelease(record))}</span>
+          </a>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderRecentReviewFeed(records, limit = 4) {
+  const reviews = records.flatMap((record) => getCommunityReviews(record).map((review) => ({
+    record,
+    review,
+    score: getReviewScore(review)
+  }))).sort((a, b) => new Date(b.review.createdAt) - new Date(a.review.createdAt)).slice(0, limit);
+
+  if (reviews.length === 0) {
+    return '<p class="empty-state">No community reviews yet.</p>';
+  }
+
+  return `
+    <div class="review-feed">
+      ${reviews.map((item) => `
+        <a href="work.html?id=${encodeParam(item.record.id)}">
+          <strong>${escapeHtml(item.record.title)}</strong>
+          <span>${escapeHtml(item.review.nickname)} / ${item.score === null ? "未評価" : `${escapeHtml(item.score)}/100`} / ${escapeHtml(item.review.createdAt)}</span>
+        </a>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderEntityMetrics(records) {
+  const average = getAverageCommunityScore(records);
+  const reviewTotal = records.reduce((sum, record) => sum + getRecordReviewCount(record), 0);
+
+  return `
+    <div class="entity-metrics" aria-label="Entity metrics">
+      <article>
+        <span>${escapeHtml(records.length)}</span>
+        <p>Works</p>
+      </article>
+      <article>
+        <span>${average === null ? "NR" : escapeHtml(average)}</span>
+        <p>Average Community Score</p>
+      </article>
+      <article>
+        <span>${escapeHtml(reviewTotal)}</span>
+        <p>Community Reviews</p>
+      </article>
+    </div>
+  `;
+}
+
+function renderWorkGraphSection(records, record, relatedRecords) {
+  const performers = getRecordPerformers(record);
+  const relatedPerformerRecords = records.filter((item) => item.id !== record.id
+    && getRecordPerformers(item).some((performer) => performers.includes(performer)));
+  const relatedTagValues = getPopularValues(
+    relatedRecords.flatMap((item) => item.tags).filter((tag) => !record.tags.includes(tag)),
+    8
+  );
+  const relatedPerformerValues = getPopularValues(
+    relatedPerformerRecords.flatMap((item) => getRecordPerformers(item)).filter((performer) => !performers.includes(performer)),
+    8
+  );
+
+  return `
+    <section class="detail-section knowledge-graph-section" aria-labelledby="knowledge-graph-title">
+      <h2 id="knowledge-graph-title">Knowledge Graph</h2>
+      <p class="section-note">この作品から演者、サークル、タグ、関連作品へ辿るための接続点です。</p>
+      <div class="graph-grid">
+        <article>
+          <h3>Related Works</h3>
+          ${renderCompactWorkList(relatedRecords)}
+        </article>
+        <article>
+          <h3>Performer Network</h3>
+          ${renderCountedLinks(relatedPerformerValues, "character")}
+        </article>
+        <article>
+          <h3>Related Tags</h3>
+          ${renderCountedLinks(relatedTagValues, "tag")}
+        </article>
+        <article>
+          <h3>Circle</h3>
+          ${renderCountedLinks([{ name: record.circle, count: records.filter((item) => item.circle === record.circle).length }], "circle")}
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function getNeighborRecordsByTags(records, matchedRecords) {
+  const matchedIds = new Set(matchedRecords.map((record) => record.id));
+  const matchedTags = new Set(matchedRecords.flatMap((record) => record.tags));
+
+  return records.filter((record) => !matchedIds.has(record.id) && record.tags.some((tag) => matchedTags.has(tag)));
+}
+
+function renderEntityGraphPage(records, type, name, matchedRecords) {
+  const titleMap = {
+    tag: "Tag",
+    circle: "Circle",
+    character: "Performer"
+  };
+  const neighborRecords = getNeighborRecordsByTags(records, matchedRecords);
+  const relatedTags = getPopularValues(
+    matchedRecords.flatMap((record) => record.tags).filter((tag) => type !== "tag" || tag !== name),
+    10
+  );
+  const relatedCircles = getPopularValues(
+    matchedRecords.map((record) => record.circle).filter((circle) => type !== "circle" || circle !== name),
+    8
+  );
+  const relatedPerformers = getPopularValues(
+    matchedRecords.flatMap((record) => getRecordPerformers(record)).filter((performer) => type !== "character" || performer !== name),
+    8
+  );
+  const fallbackRelatedCircles = relatedCircles.length > 0 ? relatedCircles : getPopularValues(
+    neighborRecords.map((record) => record.circle).filter((circle) => type !== "circle" || circle !== name),
+    8
+  );
+  const fallbackRelatedPerformers = relatedPerformers.length > 0 ? relatedPerformers : getPopularValues(
+    neighborRecords.flatMap((record) => getRecordPerformers(record)).filter((performer) => type !== "character" || performer !== name),
+    8
+  );
+  const highestRated = sortByCommunityScore(matchedRecords).slice(0, 5);
+  const representativeWorks = sortRecords(matchedRecords, "newest").slice(0, 5);
+  const indexHref = `${type}.html`;
+  const definition = type === "tag"
+    ? "Definition placeholder. 今後、分類基準・代表的な演出・隣接タグを記録する領域です。"
+    : "このエンティティに接続された作品群から、頻出分類と関連する文化的文脈を自動生成します。";
+
+  return `
+    <section class="listing-page entity-page" aria-labelledby="listing-title">
+      ${renderBackButton("database.html", "Back to Database")}
+      ${renderBreadcrumb([{ label: titleMap[type], href: indexHref }, { label: name }])}
+      <header class="entity-hero">
+        <div>
+          <p class="eyebrow">${escapeHtml(titleMap[type])} / Knowledge Graph Node</p>
+          <h1 id="listing-title">${escapeHtml(name)}</h1>
+          <p>${escapeHtml(definition)}</p>
+        </div>
+        ${renderEntityMetrics(matchedRecords)}
+      </header>
+
+      <div class="graph-grid entity-graph-grid">
+        <article>
+          <h2>Works</h2>
+          ${renderCompactWorkList(representativeWorks)}
+        </article>
+        <article>
+          <h2>Highest Rated Works</h2>
+          ${renderCompactWorkList(highestRated)}
+        </article>
+        <article>
+          <h2>Frequently Used Tags</h2>
+          ${renderCountedLinks(relatedTags, "tag")}
+        </article>
+        <article>
+          <h2>${type === "circle" ? "Main Performers" : "Related Performers"}</h2>
+          ${renderCountedLinks(fallbackRelatedPerformers, "character")}
+        </article>
+        <article>
+          <h2>${type === "tag" ? "Related Circles" : "Related Circles"}</h2>
+          ${renderCountedLinks(fallbackRelatedCircles, "circle")}
+        </article>
+        <article>
+          <h2>Timeline</h2>
+          ${renderTimeline(matchedRecords)}
+        </article>
+      </div>
+
+      <section class="detail-section" aria-labelledby="entity-all-works-title">
+        <h2 id="entity-all-works-title">All Connected Works</h2>
+        <div class="database-grid">
+          ${renderRecordGrid(sortRecords(matchedRecords, "newest"))}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
 function renderMetadataRows(record) {
   const metadata = record.metadata || {};
   const baseRows = [
@@ -744,6 +1014,8 @@ function renderHomePreview(records) {
   const latestGrid = document.querySelector("#home-latest-grid");
   const popularTags = document.querySelector("#home-popular-tags");
   const popularCircles = document.querySelector("#home-popular-circles");
+  const popularPerformers = document.querySelector("#home-popular-performers");
+  const recentReviews = document.querySelector("#home-recent-reviews");
   const randomWork = document.querySelector("#home-random-work");
   const searchInput = document.querySelector("#archive-search");
   const clearSearch = document.querySelector("#clear-search");
@@ -795,6 +1067,10 @@ function renderHomePreview(records) {
   popularCircles.innerHTML = getPopularCircles(records).map((circle) => `
     <a class="tag-button" href="circle.html?name=${encodeParam(circle.name)}">${escapeHtml(circle.name)} <span>${circle.count}</span></a>
   `).join("");
+  popularPerformers.innerHTML = getPopularCharacters(records).map((performer) => `
+    <a class="tag-button" href="character.html?name=${encodeParam(performer.name)}">${escapeHtml(performer.name)} <span>${performer.count}</span></a>
+  `).join("");
+  recentReviews.innerHTML = renderRecentReviewFeed(records);
   randomWork.innerHTML = renderRecordCard(randomRecord, "preview");
   renderHomeTags();
   renderHomeRecords();
@@ -1095,7 +1371,10 @@ function renderWorkPage(records) {
           <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
           <dl class="work-header-meta">
             ${renderMetaItem("Product ID", productId)}
-            ${renderMetaItem("Performer", performers.join(", "))}
+            <div>
+              <dt>Performer</dt>
+              <dd>${renderEntityLinks(performers, "character") || "Unrecorded"}</dd>
+            </div>
             ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
             ${renderMetaItem("Release", release)}
             ${renderMetaItem("Runtime", getRecordRuntime(record))}
@@ -1120,6 +1399,7 @@ function renderWorkPage(records) {
 
       ${renderScoreSummary(record)}
       ${renderRatingBreakdown(record)}
+      ${renderWorkGraphSection(records, record, relatedRecords)}
 
       <section class="detail-section review-cta" aria-labelledby="review-cta-title">
         <h2 id="review-cta-title">Write a Community Review</h2>
@@ -1131,14 +1411,6 @@ function renderWorkPage(records) {
       ${renderCommunityReviews(record)}
       ${renderOfficialArchiveNote(record)}
       ${renderExternalLinks(record)}
-
-      <section class="detail-section" aria-labelledby="related-title">
-        <h2 id="related-title">Related Works</h2>
-        <p class="section-note">同じタグ、キャラクター、サークルをもつ作品を自動表示します。</p>
-        <div class="database-grid related-grid">
-          ${renderRecordGrid(relatedRecords)}
-        </div>
-      </section>
     </article>
   `;
 
@@ -1159,7 +1431,7 @@ function renderListingPage(records, type) {
   const titleMap = {
     tag: "Tag",
     circle: "Circle",
-    character: "Character"
+    character: "Performer"
   };
   const allValues = {
     tag: getAllTags(records).filter((tag) => tag !== "all"),
@@ -1182,7 +1454,7 @@ function renderListingPage(records, type) {
       return record.circle === name;
     }
 
-    return record.characters.includes(name);
+    return getRecordPerformers(record).includes(name);
   });
 
   setMeta(
@@ -1190,21 +1462,7 @@ function renderListingPage(records, type) {
     `AHE LAB ${type} page for ${name}, generated from the archive JSON data source.`
   );
 
-  app.innerHTML = `
-    <section class="listing-page" aria-labelledby="listing-title">
-      ${renderBackButton("database.html", "Back to Database")}
-      ${renderBreadcrumb([{ label: titleMap[type], href: `${type}.html` }, { label: name }])}
-      <header class="detail-hero compact">
-        <p class="eyebrow">${escapeHtml(titleMap[type])} / ${matchedRecords.length} Records</p>
-        <h1 id="listing-title">${escapeHtml(name)}</h1>
-        <p>${matchedRecords.length}件の作品をJSONから自動表示しています。</p>
-      </header>
-
-      <div class="database-grid">
-        ${renderRecordGrid(sortRecords(matchedRecords, "newest"))}
-      </div>
-    </section>
-  `;
+  app.innerHTML = renderEntityGraphPage(records, type, name, matchedRecords);
 }
 
 function renderIndexPage(type, values) {
