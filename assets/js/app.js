@@ -265,14 +265,15 @@ function renderLayout(activePage) {
         </a>
 
         <nav class="site-nav" aria-label="Primary navigation">
-          <a href="index.html" ${activePage === "home" ? 'aria-current="page"' : ""}>Home</a>
           <a href="database.html" ${activePage === "database" ? 'aria-current="page"' : ""}>Database</a>
-          <a href="ranking.html" ${activePage === "ranking" ? 'aria-current="page"' : ""}>Ranking</a>
-          <a href="stats.html" ${activePage === "stats" ? 'aria-current="page"' : ""}>Stats</a>
-          <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
-          <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
           <a href="character.html" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
+          <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
+          <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
+          <a href="about.html#research">Research</a>
+          <a href="ranking.html" ${activePage === "ranking" ? 'aria-current="page"' : ""}>Ranking</a>
           <a href="about.html" ${activePage === "about" ? 'aria-current="page"' : ""}>About</a>
+          <a href="https://github.com/ahelab/ahe-lab" target="_blank" rel="noopener">Github</a>
+          <a href="https://x.com/" target="_blank" rel="noopener">X</a>
         </nav>
       </header>
     `;
@@ -284,13 +285,14 @@ function renderLayout(activePage) {
         <p>© 2026 AHE LAB. Expression Archive Institute.</p>
         <div>
           <a href="database.html">Database</a>
-          <a href="ranking.html">Ranking</a>
-          <a href="stats.html">Stats</a>
-          <a href="about.html">About</a>
-          <a href="sitemap.html">Sitemap</a>
-          <a href="tag.html">Tags</a>
-          <a href="circle.html">Circles</a>
           <a href="character.html">Characters</a>
+          <a href="circle.html">Circles</a>
+          <a href="tag.html">Tags</a>
+          <a href="about.html#research">Research</a>
+          <a href="ranking.html">Ranking</a>
+          <a href="about.html">About</a>
+          <a href="stats.html">Stats</a>
+          <a href="sitemap.html">Sitemap</a>
         </div>
       </footer>
     `;
@@ -625,6 +627,20 @@ function renderExternalLinks(record) {
         `).join("")}
       </div>
     </section>
+  `;
+}
+
+function renderExternalLinkPills(record) {
+  const links = Array.isArray(record.externalLinks) ? record.externalLinks : [];
+  const placeholderLinks = ["FANZA", "DMM", "Official"];
+
+  return `
+    <div class="work-external-inline" aria-label="External links">
+      <span>External Links</span>
+      ${links.length > 0 ? links.map((link) => `
+        <a href="${escapeHtml(link.url)}" rel="noopener" target="_blank">${escapeHtml(link.label)}</a>
+      `).join("") : placeholderLinks.map((label) => `<b>${escapeHtml(label)}</b>`).join("")}
+    </div>
   `;
 }
 
@@ -1085,6 +1101,7 @@ function renderWorkPage(records) {
             ${renderMetaItem("Runtime", getRecordRuntime(record))}
             ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
           </dl>
+          ${renderExternalLinkPills(record)}
           <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
             ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
           </button>
@@ -1095,6 +1112,11 @@ function renderWorkPage(records) {
         ${previousRecord ? `<a href="work.html?id=${encodeParam(previousRecord.id)}">← ${escapeHtml(previousRecord.title)}</a>` : "<span></span>"}
         ${nextRecord ? `<a href="work.html?id=${encodeParam(nextRecord.id)}">${escapeHtml(nextRecord.title)} →</a>` : "<span></span>"}
       </nav>
+
+      <section class="detail-section work-overview-note" aria-labelledby="overview-title">
+        <h2 id="overview-title">Overview</h2>
+        <p>${escapeHtml(archiveNote)}</p>
+      </section>
 
       ${renderScoreSummary(record)}
       ${renderRatingBreakdown(record)}
@@ -1470,7 +1492,7 @@ function renderAboutPage() {
       <div class="about-grid expanded">
         <article><h2>Mission</h2><p>アヘ顔文化を文化資料として記録し、検索可能なアーカイブとして未来に残します。</p></article>
         <article><h2>Vision</h2><p>IMDbのような一覧性と、研究機関のような分類精度を両立する公開データベースを目指します。</p></article>
-        <article><h2>Project</h2><p>HTML、CSS、Vanilla JavaScript、JSONだけで、GitHub Pages上に維持しやすい静的サイトを構築します。</p></article>
+        <article id="research"><h2>Research</h2><p>HTML、CSS、Vanilla JavaScript、JSONだけで、GitHub Pages上に維持しやすい研究アーカイブを構築します。</p></article>
         <article><h2>Roadmap</h2><p>MVP、Database、JSON駆動ページ、公開品質改善、データ拡充、検索精度改善の順に進めます。</p></article>
         <article><h2>Contribute</h2><p>新規レコードはJSONへ1件追加するだけで、Database、詳細、タグ、サークル、キャラクターへ反映されます。</p></article>
         <article><h2>GitHub</h2><p>相対パス制約を維持するため、公開サイト内ではリポジトリ情報をREADMEから参照します。</p><a class="text-link" href="README.md">Open README</a></article>
