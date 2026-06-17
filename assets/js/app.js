@@ -296,7 +296,6 @@ function renderLayout(activePage) {
 
         <nav class="site-nav" aria-label="Primary navigation">
           <a href="database.html" ${activePage === "database" ? 'aria-current="page"' : ""}>Database</a>
-          <a href="explorer.html" ${activePage === "explorer" ? 'aria-current="page"' : ""}>Explorer</a>
           <a href="character.html" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
           <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
           <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
@@ -316,7 +315,6 @@ function renderLayout(activePage) {
         <p>© 2026 AHE LAB. Expression Archive Institute.</p>
         <div>
           <a href="database.html">Database</a>
-          <a href="explorer.html">Explorer</a>
           <a href="character.html">Characters</a>
           <a href="circle.html">Circles</a>
           <a href="tag.html">Tags</a>
@@ -799,78 +797,6 @@ function renderCompactWorkList(records) {
   `;
 }
 
-function renderWorkProductFacts(record, productId, performers, maker, release, metadata) {
-  const circleName = record.circle || maker;
-  const makerHref = circleName ? `circle.html?name=${encodeParam(circleName)}` : "";
-
-  return `
-    <section class="work-facts-card" aria-labelledby="work-facts-title">
-      <h2 id="work-facts-title">Product Information</h2>
-      <dl class="work-fact-list">
-        ${renderMetaItem("Product ID", productId)}
-        <div>
-          <dt>Performer</dt>
-          <dd>${renderEntityLinks(performers, "character") || "Unrecorded"}</dd>
-        </div>
-        ${renderMetaItem("Maker", maker, makerHref)}
-        ${renderMetaItem("Release Date", release)}
-        ${renderMetaItem("Runtime", getRecordRuntime(record))}
-        ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
-      </dl>
-    </section>
-  `;
-}
-
-function renderWorkScoreCard(communityScore, communityReviews) {
-  const reviewCount = communityReviews.length;
-
-  return `
-    <section class="work-score-card" aria-label="AHE Score">
-      <span>AHE Score</span>
-      <strong>${communityScore === null ? "NR" : `${escapeHtml(communityScore)}/100`}</strong>
-      <small>${communityScore === null ? "No community score yet" : `Based on ${escapeHtml(reviewCount)} community review${reviewCount === 1 ? "" : "s"}`}</small>
-    </section>
-  `;
-}
-
-function renderWorkPrimaryReview(record) {
-  const reviews = getCommunityReviews(record);
-
-  if (reviews.length === 0) {
-    return `
-      <section class="work-primary-review" aria-labelledby="primary-review-title">
-        <h2 id="primary-review-title">Review</h2>
-        <p>No community review has been recorded yet.</p>
-      </section>
-    `;
-  }
-
-  const review = reviews[0];
-  const score = getReviewScore(review);
-
-  return `
-    <section class="work-primary-review" aria-labelledby="primary-review-title">
-      <div class="work-review-meta">
-        <h2 id="primary-review-title">Review</h2>
-        <span>${escapeHtml(review.nickname || "Community")} / ${score === null ? "No score" : `${escapeHtml(score)}/100`}</span>
-      </div>
-      <p>${escapeHtml(review.comment || "No comment recorded.")}</p>
-    </section>
-  `;
-}
-
-function renderWorkRelatedSection(relatedRecords) {
-  return `
-    <section class="detail-section work-related-section" aria-labelledby="related-works-title">
-      <div class="section-heading-row">
-        <h2 id="related-works-title">Related Works</h2>
-        <span>${escapeHtml(relatedRecords.length)} connected</span>
-      </div>
-      ${renderCompactWorkList(relatedRecords)}
-    </section>
-  `;
-}
-
 function renderRecentReviewFeed(records, limit = 4) {
   const reviews = records.flatMap((record) => getCommunityReviews(record).map((review) => ({
     record,
@@ -931,9 +857,13 @@ function renderWorkGraphSection(records, record, relatedRecords) {
 
   return `
     <section class="detail-section knowledge-graph-section" aria-labelledby="knowledge-graph-title">
-      <h2 id="knowledge-graph-title">Discovery Links</h2>
-      <p class="section-note">Related Worksの先にある、演者・サークル・タグの探索導線です。</p>
+      <h2 id="knowledge-graph-title">Knowledge Graph</h2>
+      <p class="section-note">この作品から演者、サークル、タグ、関連作品へ辿るための接続点です。</p>
       <div class="graph-grid">
+        <article>
+          <h3>Related Works</h3>
+          ${renderCompactWorkList(relatedRecords)}
+        </article>
         <article>
           <h3>Performer Network</h3>
           ${renderCountedLinks(relatedPerformerValues, "character")}
@@ -1386,8 +1316,8 @@ function renderWorkPage(records) {
   const productId = metadata.productId || "Unrecorded";
   const communityReviews = record ? getCommunityReviews(record) : [];
   const communityScore = getCommunityScore(communityReviews);
-  const thumbnail = record?.thumbnail || {
-    label: record?.id || "AHE LAB",
+  const thumbnail = record.thumbnail || {
+    label: record.id,
     accent: "#7C5CFF",
     background: "#111115"
   };
@@ -1425,30 +1355,35 @@ function renderWorkPage(records) {
     <article class="detail-page" aria-labelledby="work-title">
       ${renderBackButton("database.html", "Back to Database")}
       ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
-      <header class="work-overview work-product-layout" aria-labelledby="work-title">
+      <header class="work-overview" aria-labelledby="work-title">
         <div class="work-cover-placeholder" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
           <span>${escapeHtml(thumbnail.label || record.id)}</span>
-          <small>Package Image</small>
+          <small>Cover Image</small>
         </div>
         <div class="work-overview-body">
-          <p class="work-kicker">
-            <span>Work</span>
-            <span>${escapeHtml(record.id)}</span>
-            <span>${escapeHtml(productId)}</span>
-          </p>
+          <p class="eyebrow">Community Archive / ${escapeHtml(record.id)}</p>
           <h1 id="work-title">${escapeHtml(record.title)}</h1>
-          <div class="work-product-grid">
-            ${renderWorkScoreCard(communityScore, communityReviews)}
-            ${renderWorkProductFacts(record, productId, performers, maker, release, metadata)}
+          <div class="work-community-score">
+            <span>Community Score</span>
+            <strong>${communityScore === null ? "No community score yet" : `${escapeHtml(communityScore)}/100`}</strong>
+            ${communityScore === null ? "" : `<small>Based on ${escapeHtml(communityReviews.length)} community review${communityReviews.length === 1 ? "" : "s"}</small>`}
           </div>
           <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
-          ${renderWorkPrimaryReview(record)}
-          <div class="work-action-row">
-            ${renderExternalLinkPills(record)}
-            <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
-              ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
-            </button>
-          </div>
+          <dl class="work-header-meta">
+            ${renderMetaItem("Product ID", productId)}
+            <div>
+              <dt>Performer</dt>
+              <dd>${renderEntityLinks(performers, "character") || "Unrecorded"}</dd>
+            </div>
+            ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
+            ${renderMetaItem("Release", release)}
+            ${renderMetaItem("Runtime", getRecordRuntime(record))}
+            ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
+          </dl>
+          ${renderExternalLinkPills(record)}
+          <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
+            ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
+          </button>
         </div>
       </header>
 
@@ -1457,15 +1392,13 @@ function renderWorkPage(records) {
         ${nextRecord ? `<a href="work.html?id=${encodeParam(nextRecord.id)}">${escapeHtml(nextRecord.title)} →</a>` : "<span></span>"}
       </nav>
 
-      ${renderWorkRelatedSection(relatedRecords)}
-
       <section class="detail-section work-overview-note" aria-labelledby="overview-title">
         <h2 id="overview-title">Overview</h2>
-        <p>${escapeHtml(archiveNote || "No overview has been recorded yet.")}</p>
+        <p>${escapeHtml(archiveNote)}</p>
       </section>
 
+      ${renderScoreSummary(record)}
       ${renderRatingBreakdown(record)}
-      ${renderCommunityReviews(record)}
       ${renderWorkGraphSection(records, record, relatedRecords)}
 
       <section class="detail-section review-cta" aria-labelledby="review-cta-title">
@@ -1475,6 +1408,7 @@ function renderWorkPage(records) {
         <p class="review-cta-message" id="review-cta-message" role="status" aria-live="polite"></p>
       </section>
 
+      ${renderCommunityReviews(record)}
       ${renderOfficialArchiveNote(record)}
       ${renderExternalLinks(record)}
     </article>

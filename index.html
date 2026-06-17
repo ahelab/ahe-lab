@@ -1,87 +1,186 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AHE LAB</title>
-
-<style>
-body{
-margin:0;
-background:#ffffff;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-color:#111;
-}
-
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-padding:20px;
-}
-
-h1{
-font-size:5rem;
-margin:0;
-}
-
-.subtitle{
-font-size:1.4rem;
-margin-top:20px;
-color:#666;
-}
-
-.buttons{
-margin-top:50px;
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-}
-
-a{
-text-decoration:none;
-padding:14px 28px;
-border:2px solid #111;
-border-radius:10px;
-color:#111;
-font-weight:bold;
-}
-
-a:hover{
-background:#111;
-color:white;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AHE LAB is an Expression Archive Institute for documenting, classifying, and researching ahegao culture.">
+  <meta property="og:title" content="AHE LAB | Expression Archive Institute">
+  <meta property="og:description" content="AHE LAB is a JSON-driven static database for documenting, classifying, and researching expression archive records.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="index.html">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="AHE LAB | Expression Archive Institute">
+  <meta name="twitter:description" content="A JSON-driven expression archive database built for GitHub Pages.">
+  <link rel="canonical" href="index.html">
+  <title>AHE LAB | Expression Archive Institute</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=7">
 </head>
+<body data-page="home">
+  <div id="site-header"></div>
 
-<body>
+  <main>
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <p class="eyebrow">Archive First / Cultural Research Database</p>
+        <h1 id="hero-title">AHE LAB</h1>
+        <p class="hero-copy">
+          アヘ顔文化を記録・分類・研究する、表現アーカイブ型データベース。
+        </p>
+        <div class="hero-actions" aria-label="Main actions">
+          <a class="button primary" href="database.html">Explore Database</a>
+          <a class="button secondary" href="#about">Read Mission</a>
+        </div>
+      </div>
 
-<section class="hero">
+      <aside class="hero-panel" aria-label="Archive snapshot">
+        <dl>
+          <div>
+            <dt>Entries</dt>
+            <dd id="entry-count">0</dd>
+          </div>
+          <div>
+            <dt>Tags</dt>
+            <dd id="tag-count">0</dd>
+          </div>
+          <div>
+            <dt>Circles</dt>
+            <dd id="circle-count">0</dd>
+          </div>
+          <div>
+            <dt>Characters</dt>
+            <dd id="character-count">0</dd>
+          </div>
+          <div>
+            <dt>Latest Added</dt>
+            <dd id="latest-added-date">-</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>Phase4</dd>
+          </div>
+        </dl>
+      </aside>
+    </section>
 
-<h1>AHE LAB</h1>
+    <section class="section section-dark" aria-labelledby="home-latest-title">
+      <div class="section-heading">
+        <p class="eyebrow">Latest</p>
+        <h2 id="home-latest-title">Latest Works</h2>
+        <p>JSONの公開日から最新作品を自動表示します。</p>
+      </div>
+      <div class="record-grid" id="home-latest-grid"></div>
+    </section>
 
-<p class="subtitle">
-アヘ顔文化をアーカイブする研究所
-</p>
+    <section class="section" aria-labelledby="home-discovery-title">
+      <div class="section-heading">
+        <p class="eyebrow">Discovery</p>
+        <h2 id="home-discovery-title">Knowledge Graph Entry Points</h2>
+        <p>タグ、演者、サークル、レビューからアーカイブ内の関係性を探索できます。</p>
+      </div>
+      <div class="home-discovery">
+        <article class="home-panel">
+          <h3>Popular Tags</h3>
+          <div class="tag-cloud" id="home-popular-tags"></div>
+        </article>
+        <article class="home-panel">
+          <h3>Popular Circles</h3>
+          <div class="tag-cloud" id="home-popular-circles"></div>
+        </article>
+        <article class="home-panel">
+          <h3>Popular Performers</h3>
+          <div class="tag-cloud" id="home-popular-performers"></div>
+        </article>
+        <article class="home-panel">
+          <h3>Random Work</h3>
+          <div id="home-random-work"></div>
+        </article>
+        <article class="home-panel home-panel-wide">
+          <h3>Recent Community Reviews</h3>
+          <div id="home-recent-reviews"></div>
+        </article>
+      </div>
+    </section>
 
-<div class="buttons">
+    <section class="section section-dark" id="search" aria-labelledby="search-title">
+      <div class="section-heading">
+        <p class="eyebrow">Search</p>
+        <h2 id="search-title">Archive Search</h2>
+        <p>作品名、媒体、タグ、研究メモから横断検索できます。</p>
+      </div>
 
-<a href="#">Database</a>
+      <form class="search-bar" role="search">
+        <label class="visually-hidden" for="archive-search">Search archive</label>
+        <input id="archive-search" type="search" placeholder="Search by title, medium, tag, note..." autocomplete="off">
+        <button type="reset" id="clear-search">Clear</button>
+      </form>
+    </section>
 
-<a href="https://x.com/ahe_lab_jp">
-X
-</a>
+    <section class="section" id="database" aria-labelledby="database-title">
+      <div class="section-heading">
+        <p class="eyebrow">Database</p>
+        <h2 id="database-title">Expression Records</h2>
+        <p>IMDbのように一覧性を重視し、研究対象を比較しやすい形で整理します。</p>
+      </div>
 
-<a href="https://github.com/ahelab/ahe-lab">
-GitHub
-</a>
+      <div class="database-toolbar" aria-live="polite">
+        <span id="result-count">0 records</span>
+        <select id="sort-records" aria-label="Sort records">
+          <option value="score">Sort by AHE Score</option>
+          <option value="year">Sort by Year</option>
+          <option value="title">Sort by Title</option>
+        </select>
+      </div>
 
-</div>
+      <div class="record-grid" id="record-grid"></div>
+      <div class="section-action">
+        <a class="button primary" href="database.html">Open Full Database</a>
+      </div>
+    </section>
 
-</section>
+    <section class="section section-dark" id="tags" aria-labelledby="tags-title">
+      <div class="section-heading">
+        <p class="eyebrow">Tags</p>
+        <h2 id="tags-title">Classification Tags</h2>
+        <p>表情、構図、媒体、研究ステータスをタグで横断できます。</p>
+      </div>
 
+      <div class="tag-cloud" id="tag-cloud" aria-label="Filter by tag"></div>
+    </section>
+
+    <section class="section about-section" id="about" aria-labelledby="about-title">
+      <div class="section-heading">
+        <p class="eyebrow">About</p>
+        <h2 id="about-title">Expression Archive Institute</h2>
+      </div>
+
+      <div class="about-grid">
+        <article>
+          <h3>Mission</h3>
+          <p>
+            AHE LABは、アヘ顔という表現を一つの文化資料として記録し、
+            分類可能なデータベースとして未来に残すことを目的とします。
+          </p>
+          <a class="text-link" href="about.html">Open About</a>
+        </article>
+        <article>
+          <h3>Method</h3>
+          <p>
+            作品、媒体、タグ、表現要素、研究メモを分けて管理し、
+            参照しやすく更新しやすいアーカイブを目指します。
+          </p>
+        </article>
+        <article>
+          <h3>Principle</h3>
+          <p>
+            Archive First. 露骨な素材ではなく、表現分類と文化的文脈の記録を優先します。
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="assets/js/app.js?v=7"></script>
 </body>
 </html>

@@ -1,0 +1,97 @@
+{
+  "id": "AHE-0021",
+  "title": "New Archive Record Title",
+  "medium": "Illustration",
+  "year": 2026,
+  "publishedAt": "2026-06-14",
+  "score": 80,
+  "intensity": "Medium",
+  "status": "Draft",
+  "tags": [
+    "archive-first",
+    "sample-tag"
+  ],
+  "note": "この作品の分類メモを記入します。",
+  "circle": "New Circle Name",
+  "characters": [
+    "New Character Name"
+  ],
+  "performers": [
+    "New Performer Name"
+  ],
+  "maker": "New Maker Name",
+  "label": "New Label Name",
+  "release": "2026-06-14",
+  "runtime": "00:00",
+  "archiveNote": "研究アーカイブとしての登録理由を記入します。",
+  "reviewerNote": "確認者による補足や評価根拠を記入します。",
+  "sourceNote": "参照した公開情報や確認範囲を記入します。",
+  "curatorNote": "Curatorとしての補足メモを記入します。",
+  "verification": "Draft",
+  "metadata": {
+    "productId": "new-product-id",
+    "maker": "New Maker Name",
+    "label": "New Label Name",
+    "runtime": "00:00",
+    "verification": "Draft"
+  },
+  "scoreDetails": {
+    "expression": 80,
+    "composition": 80,
+    "context": 80,
+    "archive-value": 80
+  },
+  "rating": {
+    "eyeFocus": 8,
+    "tongueOut": 8,
+    "drool": 8,
+    "doublePeace": 8,
+    "tearsPien": 8,
+    "pleasure": 8,
+    "despairFear": 8,
+    "loyaltySubmission": 8,
+    "expressionDuration": 8,
+    "workConcept": 8
+  },
+  "communityReviews": [
+    {
+      "nickname": "AHELAB",
+      "role": "Curator",
+      "createdAt": "2026-06-14",
+      "rating": {
+        "eyeFocus": 8,
+        "tongueOut": 8,
+        "drool": 8,
+        "doublePeace": 8,
+        "tearsPien": 8,
+        "pleasure": 8,
+        "despairFear": 8,
+        "loyaltySubmission": 8,
+        "expressionDuration": 8,
+        "workConcept": 8
+      },
+      "comment": "立ち上げ初期のサンプルレビューとして登録。",
+      "helpfulCount": 0
+    }
+  ],
+  "externalLinks": [
+    {
+      "label": "Official",
+      "url": "https://example.com",
+      "note": "Official reference page"
+    }
+  ],
+  "tagCategories": {
+    "expression": [
+      "archive-first"
+    ],
+    "format": [
+      "sample-tag"
+    ]
+  },
+  "thumbnail": {
+    "label": "#0021",
+    "accent": "#7C5CFF",
+    "background": "#111115"
+  }
+}
