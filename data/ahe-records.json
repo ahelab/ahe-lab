@@ -14,16 +14,30 @@
       "illustration",
       "high-intensity"
     ],
+    "concepts": [
+      "concept-gesture-coding",
+      "concept-visual-overload",
+      "concept-ahegao"
+    ],
+    "expressionPatterns": [
+      "pattern-double-peace",
+      "pattern-peace-pose-hold"
+    ],
+    "researchRefs": [
+      "research-gesture-coding-v1"
+    ],
     "note": "初期インターネット文化で広く参照される構図を分類した基礎レコード。",
     "circle": "Archive Unit 01",
-    "characters": [
-      "Mio Archive"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0001",
       "accent": "#7C5CFF",
       "background": "#111115"
-    }
+    },
+    "cultures": [],
+    "events": [
+      "event-ahegao-double-peace-codification"
+    ]
   },
   {
     "id": "AHE-0002",
@@ -40,16 +54,31 @@
       "symbolic",
       "panel-study"
     ],
+    "concepts": [
+      "concept-facial-iconography",
+      "concept-camera-proximity-expression"
+    ],
+    "expressionPatterns": [
+      "pattern-crossed-eyes",
+      "pattern-vacant-gaze"
+    ],
+    "researchRefs": [
+      "research-facial-iconography-v1"
+    ],
     "note": "視線方向とコマ配置が表現の強度に与える影響を記録。",
     "circle": "Lens Index",
-    "characters": [
-      "Rena Lens"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0002",
       "accent": "#4F8CFF",
       "background": "#050506"
-    }
+    },
+    "cultures": [
+      "culture-erotic-manga"
+    ],
+    "events": [
+      "event-ahegao-manga-origin"
+    ]
   },
   {
     "id": "AHE-0003",
@@ -66,16 +95,31 @@
       "derivative",
       "researching"
     ],
+    "concepts": [
+      "concept-meme-transmission",
+      "concept-facial-iconography"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption",
+      "pattern-tongue-out"
+    ],
+    "researchRefs": [
+      "research-meme-transmission-v1"
+    ],
     "note": "SNS上での二次流通とタグ変化を追跡するためのサンプル。",
     "circle": "Web Folklore Lab",
-    "characters": [
-      "Nika Web"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0003",
       "accent": "#9D5CFF",
       "background": "#17121F"
-    }
+    },
+    "cultures": [
+      "culture-doujinshi"
+    ],
+    "events": [
+      "event-ahegao-internet-meme-expansion"
+    ]
   },
   {
     "id": "AHE-0004",
@@ -92,16 +136,28 @@
       "archive-first",
       "classification"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-facial-iconography"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "AHE LABの分類体系を検証するための研究ノート型レコード。",
     "circle": "Taxonomy Desk",
-    "characters": [
-      "Ari Taxon"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0004",
       "accent": "#5CE1E6",
       "background": "#101418"
-    }
+    },
+    "cultures": [],
+    "events": [
+      "event-ahegao-archive-institutionalization"
+    ]
   },
   {
     "id": "AHE-0005",
@@ -118,16 +174,29 @@
       "symbolic",
       "classification"
     ],
+    "concepts": [
+      "concept-facial-iconography",
+      "concept-meme-transmission"
+    ],
+    "expressionPatterns": [
+      "pattern-white-eyes",
+      "pattern-crossed-eyes"
+    ],
+    "researchRefs": [
+      "research-facial-iconography-v1"
+    ],
     "note": "記号化された表情要素を、線、目線、口元の3軸で整理。",
     "circle": "Icon Studio",
-    "characters": [
-      "Suzu Icon"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0005",
       "accent": "#FF5CA8",
       "background": "#14080F"
-    }
+    },
+    "cultures": [],
+    "events": [
+      "event-ahegao-manga-origin"
+    ]
   },
   {
     "id": "AHE-0006",
@@ -144,16 +213,29 @@
       "rhythm",
       "high-intensity"
     ],
+    "concepts": [
+      "concept-camera-proximity-expression",
+      "concept-climax-signaling"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression",
+      "pattern-open-mouth"
+    ],
+    "researchRefs": [
+      "research-camera-proximity-expression-v1"
+    ],
     "note": "ページ内のリズムと表情の段階変化を比較対象として記録。",
     "circle": "Panel Metrics",
-    "characters": [
-      "Koto Panel"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0006",
       "accent": "#FFD166",
       "background": "#161207"
-    }
+    },
+    "cultures": [
+      "culture-erotic-manga"
+    ],
+    "events": []
   },
   {
     "id": "AHE-0007",
@@ -170,16 +252,30 @@
       "forum",
       "researching"
     ],
+    "concepts": [
+      "concept-meme-transmission",
+      "concept-archive-verification"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption"
+    ],
+    "researchRefs": [
+      "research-meme-transmission-v1"
+    ],
     "note": "掲示板文化における語彙の定着過程を追うための参照レコード。",
     "circle": "Forum Trace",
-    "characters": [
-      "Yui Forum"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0007",
       "accent": "#7C5CFF",
       "background": "#243B55"
-    }
+    },
+    "cultures": [
+      "culture-japanese-internet-culture"
+    ],
+    "events": [
+      "event-ahegao-internet-meme-expansion"
+    ]
   },
   {
     "id": "AHE-0008",
@@ -196,16 +292,31 @@
       "metadata",
       "classification"
     ],
+    "concepts": [
+      "concept-gesture-coding",
+      "concept-role-collapse"
+    ],
+    "expressionPatterns": [
+      "pattern-collapsed-posture",
+      "pattern-peace-pose-hold"
+    ],
+    "researchRefs": [
+      "research-gesture-coding-v1"
+    ],
     "note": "キャラクター姿勢と表情タグを分離して管理するための試験データ。",
     "circle": "Pose Metadata Group",
-    "characters": [
-      "Lina Pose"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0008",
       "accent": "#90BE6D",
       "background": "#0D160F"
-    }
+    },
+    "cultures": [
+      "culture-bishojo-game"
+    ],
+    "events": [
+      "event-ahegao-double-peace-codification"
+    ]
   },
   {
     "id": "AHE-0009",
@@ -222,17 +333,30 @@
       "manifest",
       "taxonomy"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-meme-transmission"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "AHE LABの思想とデータベース方針を結びつける中核メモ。",
     "circle": "Archive Unit 01",
-    "characters": [
-      "Mio Archive",
-      "Ari Taxon"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0009",
       "accent": "#B5179E",
       "background": "#120615"
-    }
+    },
+    "cultures": [
+      "culture-doujinshi"
+    ],
+    "events": [
+      "event-ahegao-archive-institutionalization"
+    ]
   },
   {
     "id": "AHE-0010",
@@ -249,16 +373,29 @@
       "composition",
       "symbolic"
     ],
+    "concepts": [
+      "concept-facial-iconography",
+      "concept-camera-proximity-expression"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression",
+      "pattern-flushed-face"
+    ],
+    "researchRefs": [
+      "research-camera-proximity-expression-v1"
+    ],
     "note": "表紙構図におけるコントラストと視認性を評価するレコード。",
     "circle": "Cover Signal",
-    "characters": [
-      "Noa Cover"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0010",
       "accent": "#F77F00",
       "background": "#1B0F03"
-    }
+    },
+    "cultures": [
+      "culture-bishojo-game"
+    ],
+    "events": []
   },
   {
     "id": "AHE-0011",
@@ -275,16 +412,27 @@
       "gaze",
       "high-intensity"
     ],
+    "concepts": [
+      "concept-climax-signaling",
+      "concept-camera-proximity-expression"
+    ],
+    "expressionPatterns": [
+      "pattern-eye-roll-transition",
+      "pattern-heavy-breathing-face"
+    ],
+    "researchRefs": [
+      "research-climax-signaling-v1"
+    ],
     "note": "表情変化のタイミングを静止画資料とは別軸で分類。",
     "circle": "Motion Timing Lab",
-    "characters": [
-      "Ema Motion"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0011",
       "accent": "#00BBF9",
       "background": "#06131A"
-    }
+    },
+    "cultures": [],
+    "events": []
   },
   {
     "id": "AHE-0012",
@@ -301,16 +449,26 @@
       "linework",
       "low-intensity"
     ],
+    "concepts": [
+      "concept-facial-iconography",
+      "concept-archive-verification"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression"
+    ],
+    "researchRefs": [
+      "research-facial-iconography-v1"
+    ],
     "note": "少ない線で成立する表現記号を、簡略化の観点から保存。",
     "circle": "Minimal Line Works",
-    "characters": [
-      "Suzu Icon"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0012",
       "accent": "#E0AAFF",
       "background": "#191126"
-    }
+    },
+    "cultures": [],
+    "events": []
   },
   {
     "id": "AHE-0013",
@@ -327,16 +485,31 @@
       "tag-drift",
       "meme"
     ],
+    "concepts": [
+      "concept-meme-transmission",
+      "concept-archive-verification"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption"
+    ],
+    "researchRefs": [
+      "research-meme-transmission-v1"
+    ],
     "note": "派生投稿によってタグの意味が変化する現象を追跡。",
     "circle": "Web Folklore Lab",
-    "characters": [
-      "Nika Web"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0013",
       "accent": "#7C5CFF",
       "background": "#0B132B"
-    }
+    },
+    "cultures": [
+      "culture-doujinshi",
+      "culture-japanese-internet-culture"
+    ],
+    "events": [
+      "event-ahegao-internet-meme-expansion"
+    ]
   },
   {
     "id": "AHE-0014",
@@ -353,17 +526,31 @@
       "classification",
       "panel-study"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-facial-iconography"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression",
+      "pattern-vacant-gaze"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "単体表情ではなく前後文脈を含めた分類テスト。",
     "circle": "Panel Metrics",
-    "characters": [
-      "Koto Panel",
-      "Rena Lens"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0014",
       "accent": "#F72585",
       "background": "#180612"
-    }
+    },
+    "cultures": [
+      "culture-erotic-manga"
+    ],
+    "events": [
+      "event-ahegao-manga-origin"
+    ]
   },
   {
     "id": "AHE-0015",
@@ -380,16 +567,30 @@
       "purple",
       "metadata"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-camera-proximity-expression"
+    ],
+    "expressionPatterns": [
+      "pattern-close-up-expression"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "AHE LABの画面設計とアーカイブ体験を評価するUI用レコード。",
     "circle": "Interface Room",
-    "characters": [
-      "Iris UI"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0015",
       "accent": "#B8F2E6",
       "background": "#061616"
-    }
+    },
+    "cultures": [
+      "culture-bishojo-game"
+    ],
+    "events": [
+      "event-ahegao-archive-institutionalization"
+    ]
   },
   {
     "id": "AHE-0016",
@@ -406,16 +607,27 @@
       "calibration",
       "high-intensity"
     ],
+    "concepts": [
+      "concept-climax-signaling",
+      "concept-archive-verification"
+    ],
+    "expressionPatterns": [
+      "pattern-white-eyes",
+      "pattern-open-mouth"
+    ],
+    "researchRefs": [
+      "research-climax-signaling-v1"
+    ],
     "note": "AHE SCOREを主観評価だけにしないための基準点。",
     "circle": "Score Review Board",
-    "characters": [
-      "Ari Taxon"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0016",
       "accent": "#C1121F",
       "background": "#1A0507"
-    }
+    },
+    "cultures": [],
+    "events": []
   },
   {
     "id": "AHE-0017",
@@ -432,17 +644,29 @@
       "revival",
       "composition"
     ],
+    "concepts": [
+      "concept-meme-transmission",
+      "concept-facial-iconography"
+    ],
+    "expressionPatterns": [
+      "pattern-white-eyes",
+      "pattern-double-peace"
+    ],
+    "researchRefs": [
+      "research-meme-transmission-v1"
+    ],
     "note": "古典的モチーフが新しい絵柄で再出現する例を記録。",
     "circle": "Icon Studio",
-    "characters": [
-      "Suzu Icon",
-      "Mio Archive"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0017",
       "accent": "#80FFDB",
       "background": "#061A16"
-    }
+    },
+    "cultures": [],
+    "events": [
+      "event-ahegao-double-peace-codification"
+    ]
   },
   {
     "id": "AHE-0018",
@@ -459,16 +683,29 @@
       "web",
       "timing"
     ],
+    "concepts": [
+      "concept-camera-proximity-expression",
+      "concept-climax-signaling"
+    ],
+    "expressionPatterns": [
+      "pattern-heavy-breathing-face",
+      "pattern-eye-roll-transition"
+    ],
+    "researchRefs": [
+      "research-camera-proximity-expression-v1"
+    ],
     "note": "短尺動画プラットフォームでの表現変換を調査するための記録。",
     "circle": "Motion Timing Lab",
-    "characters": [
-      "Ema Motion"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0018",
       "accent": "#AACC00",
       "background": "#111705"
-    }
+    },
+    "cultures": [
+      "culture-japanese-internet-culture"
+    ],
+    "events": []
   },
   {
     "id": "AHE-0019",
@@ -485,17 +722,28 @@
       "archive-first",
       "score"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-climax-signaling"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "登録ルール、スコア、タグ粒度を検証するためのプロトタイプ。",
     "circle": "Taxonomy Desk",
-    "characters": [
-      "Ari Taxon",
-      "Iris UI"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0019",
       "accent": "#8338EC",
       "background": "#130A24"
-    }
+    },
+    "cultures": [],
+    "events": [
+      "event-ahegao-archive-institutionalization"
+    ]
   },
   {
     "id": "AHE-0020",
@@ -512,17 +760,32 @@
       "mvp",
       "archive-first"
     ],
+    "concepts": [
+      "concept-archive-verification",
+      "concept-meme-transmission"
+    ],
+    "expressionPatterns": [
+      "pattern-broken-speech-caption"
+    ],
+    "researchRefs": [
+      "research-archive-verification-v1"
+    ],
     "note": "Phase2 Databaseページ公開用の20件目サンプルレコード。",
     "circle": "Database Office",
-    "characters": [
-      "Mio Archive",
-      "Iris UI"
-    ],
+    "characters": [],
     "thumbnail": {
       "label": "#0020",
       "accent": "#FFBE0B",
       "background": "#1B1302"
-    }
+    },
+    "cultures": [
+      "culture-doujinshi",
+      "culture-japanese-internet-culture"
+    ],
+    "events": [
+      "event-ahegao-archive-institutionalization",
+      "event-ahegao-internet-meme-expansion"
+    ]
   },
   {
     "id": "AHE-0021",
@@ -541,10 +804,23 @@
       "ドラッグ演出",
       "キメセク演出"
     ],
+    "concepts": [
+      "concept-ahegao",
+      "concept-submission-expression",
+      "concept-altered-state-performance"
+    ],
+    "expressionPatterns": [
+      "pattern-tongue-out",
+      "pattern-double-peace",
+      "pattern-tears-pien"
+    ],
+    "researchRefs": [
+      "research-ahe-0021-ahegao-archive-note"
+    ],
     "note": "Product ID: h_1240milk259。Verification: Full Verified。本作品は、作品コンセプトおよび公開されているサンプル画像・商品情報から、アヘ顔表現を主要な演出要素として扱っていることが確認できる。また、公開レビューにおいてもアヘ顔演出に言及があり、AHE LABの研究対象作品として登録する価値が高い。",
     "circle": "MILK",
     "characters": [
-      "冬愛ことね"
+      "character-fua-kotone"
     ],
     "performers": [
       "冬愛ことね"
@@ -602,6 +878,123 @@
       "label": "#000001",
       "accent": "#7C5CFF",
       "background": "#111115"
-    }
+    },
+    "cultures": [
+      "culture-av-performance"
+    ],
+    "events": [
+      "event-ahegao-archive-institutionalization",
+      "event-ahegao-av-performance-adoption",
+      "event-ahegao-double-peace-codification"
+    ],
+    "reviews": [
+      "review-ahe-0021-curator-001"
+    ],
+    "communityInsights": [
+      "insight-ahe-0021-av-ahegao-observation"
+    ]
+  },
+  {
+    "id": "AHE-0022",
+    "title": "「無口で大人しい妹だから何してもいいよね」気弱な妹を洗脳催●したら乳首が100倍敏感になってアヘ顔乳首アクメするようになってしまいました",
+    "medium": "Video",
+    "year": 2026,
+    "publishedAt": "2026-04-14",
+    "score": 66,
+    "intensity": "Medium",
+    "status": "Reviewed",
+    "tags": [
+      "ahegao",
+      "tongue-out",
+      "white-eyes",
+      "double-peace",
+      "drool",
+      "hypnosis",
+      "submission",
+      "nipple-orgasm"
+    ],
+    "concepts": [
+      "concept-ahegao",
+      "concept-submission-expression",
+      "concept-altered-state-performance"
+    ],
+    "expressionPatterns": [
+      "pattern-tongue-out",
+      "pattern-double-peace",
+      "pattern-white-eyes"
+    ],
+    "researchRefs": [],
+    "note": "Product ID: gvh834。Verification: Full Verified。舌出しとダブルピースが強い、服従系・快楽没入型のアヘ顔作品。Full Verified。",
+    "circle": "グローリークエスト",
+    "characters": [
+      "character-fua-kotone",
+      "character-submission-subject",
+      "character-altered-state-subject"
+    ],
+    "performers": [
+      "冬愛ことね"
+    ],
+    "maker": "グローリークエスト",
+    "label": "グローリークエスト",
+    "release": "2026-04-14",
+    "runtime": "Unrecorded",
+    "verification": "Full Verified",
+    "archiveNote": "舌出しとダブルピースが強い、服従系・快楽没入型のアヘ顔作品として登録。",
+    "sourceNote": "Product ID: gvh834。公開商品情報を確認。",
+    "curatorNote": "Full Verifiedとして登録。",
+    "metadata": {
+      "productId": "gvh834",
+      "maker": "グローリークエスト",
+      "label": "グローリークエスト",
+      "runtime": "Unrecorded",
+      "verification": "Full Verified",
+      "sourceNote": "公開商品情報を確認"
+    },
+    "rating": {
+      "eyeFocus": 8,
+      "tongueOut": 10,
+      "drool": 4,
+      "doublePeace": 8,
+      "tearsPien": 2,
+      "pleasure": 9,
+      "despairFear": 1,
+      "loyaltySubmission": 8,
+      "expressionDuration": 8,
+      "workConcept": 8
+    },
+    "communityReviews": [
+      {
+        "nickname": "AHELAB",
+        "role": "Curator",
+        "createdAt": "2026-06-18",
+        "rating": {
+          "eyeFocus": 8,
+          "tongueOut": 10,
+          "drool": 4,
+          "doublePeace": 8,
+          "tearsPien": 2,
+          "pleasure": 9,
+          "despairFear": 1,
+          "loyaltySubmission": 8,
+          "expressionDuration": 8,
+          "workConcept": 8
+        },
+        "comment": "舌出しとダブルピースが強い、服従系・快楽没入型のアヘ顔作品。Full Verified。",
+        "helpfulCount": 0
+      }
+    ],
+    "thumbnail": {
+      "label": "#0022",
+      "accent": "#7C5CFF",
+      "background": "#111115"
+    },
+    "cultures": [
+      "culture-av-performance"
+    ],
+    "events": [
+      "event-ahegao-archive-institutionalization",
+      "event-ahegao-av-performance-adoption",
+      "event-ahegao-double-peace-codification"
+    ]
   }
 ]
