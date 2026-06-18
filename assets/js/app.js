@@ -549,13 +549,20 @@ function renderHomeShelfCard(record) {
     accent: "#7C5CFF",
     background: "#111115"
   };
+  const thumbnailUrl = typeof thumbnail === "string"
+    ? thumbnail
+    : thumbnail.url || thumbnail.src || thumbnail.image || "";
   const communityScore = getRecordCommunityScore(record);
+  const coverStyle = typeof thumbnail === "object"
+    ? `--thumb-accent:${escapeHtml(thumbnail.accent || "#7C5CFF")}; --thumb-bg:${escapeHtml(thumbnail.background || "#111115")};`
+    : "--thumb-accent:#7C5CFF; --thumb-bg:#111115;";
 
   return `
     <a class="home-work-card" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}">
-      <span class="home-work-cover" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
-        <small>${escapeHtml(record.metadata?.productId || record.productId || record.id)}</small>
-        <strong>Package Image</strong>
+      <span class="home-work-cover${thumbnailUrl ? " has-image" : ""}" style="${coverStyle}">
+        ${thumbnailUrl
+          ? `<img src="${escapeHtml(thumbnailUrl)}" alt="${escapeHtml(record.title)} package image" loading="lazy">`
+          : `<strong>Package Image</strong>`}
       </span>
       <span class="home-work-title">${escapeHtml(record.title)}</span>
       <span class="home-work-score">${communityScore === null ? "NR" : `${escapeHtml(communityScore)}/100`}</span>
@@ -1032,7 +1039,7 @@ function renderHomePreview(records) {
     "SNS": document.querySelector("#home-type-sns-shelf")
   };
 
-  if (!latestShelf || !highScoreShelf || !popularTags) {
+  if (!latestShelf || !highScoreShelf) {
     return;
   }
 
@@ -1045,9 +1052,11 @@ function renderHomePreview(records) {
     }
   });
 
-  popularTags.innerHTML = HOME_POPULAR_TAGS.map((tag) => `
-    <a class="tag-button" href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
-  `).join("");
+  if (popularTags) {
+    popularTags.innerHTML = HOME_POPULAR_TAGS.map((tag) => `
+      <a class="tag-button" href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
+    `).join("");
+  }
 }
 
 function renderDatabasePage(records) {
