@@ -570,6 +570,111 @@ function renderHomeShelfCard(record) {
   `;
 }
 
+function getHomeThumbnail(record) {
+  const thumbnail = record.thumbnail || {
+    label: record.id,
+    accent: "#7C5CFF",
+    background: "#111115"
+  };
+  const url = typeof thumbnail === "string"
+    ? thumbnail
+    : thumbnail.url || thumbnail.src || thumbnail.image || "";
+  const style = typeof thumbnail === "object"
+    ? `--thumb-accent:${escapeHtml(thumbnail.accent || "#7C5CFF")}; --thumb-bg:${escapeHtml(thumbnail.background || "#111115")};`
+    : "--thumb-accent:#7C5CFF; --thumb-bg:#111115;";
+
+  return { url, style };
+}
+
+function renderHomeFeatureCard(record, position) {
+  const thumbnail = getHomeThumbnail(record);
+  const communityScore = getRecordCommunityScore(record);
+
+  return `
+    <a class="home-feature-card ${position}" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="${thumbnail.style}">
+      ${thumbnail.url
+        ? `<img src="${escapeHtml(thumbnail.url)}" alt="${escapeHtml(record.title)} package image" loading="lazy">`
+        : `<span class="home-feature-placeholder">Package Image</span>`}
+      <span class="home-feature-info">
+        <strong>${escapeHtml(record.title)}</strong>
+        <span>${communityScore === null ? "NR" : `${escapeHtml(communityScore)}/100`}</span>
+      </span>
+    </a>
+  `;
+}
+
+function renderHomeFeatureStrip(records) {
+  const featured = sortRecords(records, "newest").slice(0, 3);
+
+  if (featured.length === 0) {
+    return "";
+  }
+
+  const ordered = [featured[1], featured[0], featured[2]].filter(Boolean);
+
+  return ordered.map((record, index) => {
+    const position = index === 1 || ordered.length === 1 ? "is-main" : "is-side";
+    return renderHomeFeatureCard(record, position);
+  }).join("");
+}
+
+function formatCharacterName(value) {
+  const text = String(value || "").replace(/^character-/, "");
+
+  return text
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function getHomeCharacters(records, limit = 6) {
+  const characterMap = new Map();
+
+  records.forEach((record) => {
+    const performers = record.performers || [];
+
+    (record.characters || []).forEach((characterId) => {
+      const current = characterMap.get(characterId) || {
+        id: characterId,
+        name: formatCharacterName(characterId),
+        count: 0
+      };
+
+      if (characterId === "character-fua-kotone" && performers[0]) {
+        current.name = performers[0];
+      }
+
+      current.count += 1;
+      characterMap.set(characterId, current);
+    });
+  });
+
+  return [...characterMap.values()]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .slice(0, limit);
+}
+
+function renderHomeCharacterCard(character) {
+  return `
+    <a class="home-character-card" href="character.html?name=${encodeParam(character.id)}" aria-label="Open ${escapeHtml(character.name)}">
+      <span class="home-character-avatar">${escapeHtml(character.name.charAt(0) || "A")}</span>
+      <strong>${escapeHtml(character.name)}</strong>
+      <span>${escapeHtml(character.count)} works</span>
+    </a>
+  `;
+}
+
+function renderHomeCharacterShelf(records) {
+  const characters = getHomeCharacters(records);
+
+  if (characters.length === 0) {
+    return '<p class="empty-state">No characters yet.</p>';
+  }
+
+  return characters.map(renderHomeCharacterCard).join("");
+}
+
 function renderHomeShelf(records) {
   if (records.length === 0) {
     return '<p class="empty-state">No works yet.</p>';
@@ -1040,6 +1145,8 @@ function renderCategorizedTags(record) {
 // Page renderers.
 function renderHomePreview(records) {
   const shelfLimit = 6;
+  const featureStrip = document.querySelector("#home-feature-strip");
+  const characterShelf = document.querySelector("#home-character-shelf");
   const latestShelf = document.querySelector("#home-latest-shelf");
   const highScoreShelf = document.querySelector("#home-high-score-shelf");
   const popularTags = document.querySelector("#home-popular-tags");
@@ -1053,6 +1160,14 @@ function renderHomePreview(records) {
 
   if (!latestShelf || !highScoreShelf) {
     return;
+  }
+
+  if (featureStrip) {
+    featureStrip.innerHTML = renderHomeFeatureStrip(records);
+  }
+
+  if (characterShelf) {
+    characterShelf.innerHTML = renderHomeCharacterShelf(records);
   }
 
   latestShelf.innerHTML = renderHomeShelf(sortRecords(records, "newest").slice(0, shelfLimit));
