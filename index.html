@@ -13,7 +13,7 @@
   <meta name="twitter:description" content="A JSON-driven expression archive database built for GitHub Pages.">
   <link rel="canonical" href="index.html">
   <title>AHE LAB | Expression Archive Institute</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=7">
+  <link rel="stylesheet" href="assets/css/style.css?v=8">
 </head>
 <body data-page="home">
   <div id="site-header"></div>
@@ -21,61 +21,32 @@
   <main>
     <section class="hero" id="home" aria-labelledby="hero-title">
       <div class="hero-content">
-        <p class="eyebrow">Archive First / Cultural Research Database</p>
+        <p class="eyebrow">Cultural Database</p>
         <h1 id="hero-title">AHE LAB</h1>
         <p class="hero-copy">
-          アヘ顔文化を記録・分類・研究する、表現アーカイブ型データベース。
+          作品、演者、メーカー、タグ、レビューから探せるアヘ顔文化データベース。
         </p>
         <div class="hero-actions" aria-label="Main actions">
-          <a class="button primary" href="database.html">Explore Database</a>
-          <a class="button secondary" href="#about">Read Mission</a>
+          <a class="button primary" href="database.html">Browse Works</a>
+          <a class="button secondary" href="#search">Search</a>
         </div>
       </div>
-
-      <aside class="hero-panel" aria-label="Archive snapshot">
-        <dl>
-          <div>
-            <dt>Entries</dt>
-            <dd id="entry-count">0</dd>
-          </div>
-          <div>
-            <dt>Tags</dt>
-            <dd id="tag-count">0</dd>
-          </div>
-          <div>
-            <dt>Circles</dt>
-            <dd id="circle-count">0</dd>
-          </div>
-          <div>
-            <dt>Characters</dt>
-            <dd id="character-count">0</dd>
-          </div>
-          <div>
-            <dt>Latest Added</dt>
-            <dd id="latest-added-date">-</dd>
-          </div>
-          <div>
-            <dt>Status</dt>
-            <dd>Phase4</dd>
-          </div>
-        </dl>
-      </aside>
     </section>
 
     <section class="section section-dark" aria-labelledby="home-latest-title">
       <div class="section-heading">
         <p class="eyebrow">Latest</p>
         <h2 id="home-latest-title">Latest Works</h2>
-        <p>JSONの公開日から最新作品を自動表示します。</p>
+        <p>最近追加された作品を一覧で確認できます。</p>
       </div>
       <div class="record-grid" id="home-latest-grid"></div>
     </section>
 
     <section class="section" aria-labelledby="home-discovery-title">
       <div class="section-heading">
-        <p class="eyebrow">Discovery</p>
-        <h2 id="home-discovery-title">Knowledge Graph Entry Points</h2>
-        <p>タグ、演者、サークル、レビューからアーカイブ内の関係性を探索できます。</p>
+        <p class="eyebrow">Browse</p>
+        <h2 id="home-discovery-title">Find by Tag, Performer, Maker</h2>
+        <p>作品を探すための主要な入口です。</p>
       </div>
       <div class="home-discovery">
         <article class="home-panel">
@@ -105,7 +76,7 @@
       <div class="section-heading">
         <p class="eyebrow">Search</p>
         <h2 id="search-title">Archive Search</h2>
-        <p>作品名、媒体、タグ、研究メモから横断検索できます。</p>
+        <p>作品名、演者、メーカー、タグから検索できます。</p>
       </div>
 
       <form class="search-bar" role="search">
@@ -119,7 +90,7 @@
       <div class="section-heading">
         <p class="eyebrow">Database</p>
         <h2 id="database-title">Expression Records</h2>
-        <p>IMDbのように一覧性を重視し、研究対象を比較しやすい形で整理します。</p>
+        <p>作品を比較しやすいデータベース型の一覧です。</p>
       </div>
 
       <div class="database-toolbar" aria-live="polite">
@@ -141,7 +112,7 @@
       <div class="section-heading">
         <p class="eyebrow">Tags</p>
         <h2 id="tags-title">Classification Tags</h2>
-        <p>表情、構図、媒体、研究ステータスをタグで横断できます。</p>
+        <p>代表的なタグから作品へ移動できます。</p>
       </div>
 
       <div class="tag-cloud" id="tag-cloud" aria-label="Filter by tag"></div>
@@ -181,6 +152,6 @@
 
   <div id="site-footer"></div>
 
-  <script src="assets/js/app.js?v=7"></script>
+  <script src="assets/js/app.js?v=8"></script>
 </body>
 </html>

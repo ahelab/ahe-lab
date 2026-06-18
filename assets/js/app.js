@@ -375,6 +375,20 @@ function renderTagLinks(tags) {
   `).join("");
 }
 
+function renderTagLinksLimited(tags, limit = 6) {
+  const visibleTags = tags.slice(0, limit);
+  const hiddenCount = Math.max(0, tags.length - visibleTags.length);
+
+  return `
+    ${renderTagLinks(visibleTags)}
+    ${hiddenCount > 0 ? `<span>+${escapeHtml(hiddenCount)}</span>` : ""}
+  `;
+}
+
+function formatWorkCount(count) {
+  return `${count} work${count === 1 ? "" : "s"}`;
+}
+
 function renderRecordCard(record, variant = "database") {
   const thumbnail = record.thumbnail || {
     label: record.id,
@@ -382,15 +396,17 @@ function renderRecordCard(record, variant = "database") {
     background: "#111115"
   };
   const performers = getRecordPerformers(record);
+  const maker = getRecordMaker(record);
+  const productId = record.metadata?.productId || record.productId || record.id;
   const communityScore = getRecordCommunityScore(record);
   const reviewCount = getRecordReviewCount(record);
   const release = getRecordRelease(record);
   const detailMarkup = variant === "database"
     ? `
       <dl class="record-details">
+        <div><dt>Maker</dt><dd><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(maker)}</a></dd></div>
         <div><dt>Release</dt><dd>${escapeHtml(release)}</dd></div>
         <div><dt>Reviews</dt><dd>${escapeHtml(reviewCount)}</dd></div>
-        <div><dt>Circle</dt><dd><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></dd></div>
       </dl>
     `
     : "";
@@ -398,25 +414,22 @@ function renderRecordCard(record, variant = "database") {
   return `
     <article class="record-card ${variant === "database" ? "database-card" : ""}">
       <a class="record-poster record-link" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
-        <span class="record-code">${escapeHtml(thumbnail.label || record.id)}</span>
-        <span class="record-thumb-title">${escapeHtml(record.medium)}</span>
+        <span class="record-code">${escapeHtml(productId)}</span>
+        <span class="record-thumb-title">Package Image</span>
         <span class="record-score" aria-label="Community Score ${communityScore === null ? "not rated" : escapeHtml(communityScore)}">${communityScore === null ? "NR" : escapeHtml(communityScore)}</span>
       </a>
       <div class="record-body">
-        <p class="record-meta">${escapeHtml(record.medium)} / ${escapeHtml(record.year)} / ${escapeHtml(release)}</p>
+        <p class="record-meta">${escapeHtml(productId)}</p>
         <h3><a href="work.html?id=${encodeParam(record.id)}">${escapeHtml(record.title)}</a></h3>
-        <p class="record-circle"><a href="circle.html?name=${encodeParam(record.circle)}">${escapeHtml(record.circle)}</a></p>
+        <p class="record-circle">${renderEntityLinks(performers, "character") || "Unrecorded"}</p>
         <p class="record-statline">
-          <strong>Community Score ${communityScore === null ? "No score" : `${escapeHtml(communityScore)}/100`}</strong>
-          <span>${escapeHtml(reviewCount)} review${reviewCount === 1 ? "" : "s"}</span>
+          <strong>AHE Score ${communityScore === null ? "No score" : `${escapeHtml(communityScore)}/100`}</strong>
+          <span>${escapeHtml(maker)}</span>
+          <span>${escapeHtml(release)}</span>
         </p>
-        <p class="record-note">${escapeHtml(record.note)}</p>
         ${detailMarkup}
-        <div class="entity-links" aria-label="Performers">
-          ${renderEntityLinks(performers, "character")}
-        </div>
         <div class="record-tags">
-          ${renderTagLinks(record.tags)}
+          ${renderTagLinksLimited(record.tags, variant === "database" ? 5 : 4)}
         </div>
       </div>
     </article>
@@ -474,42 +487,6 @@ function renderScoreDetails(record) {
   `).join("");
 }
 
-function getRatingValue(record, key) {
-  const value = record.rating?.[key];
-
-  return Number.isInteger(value) && value >= 0 && value <= 10 ? value : null;
-}
-
-function getRatingTotal(record) {
-  const values = RATING_STANDARD_ITEMS.map((item) => getRatingValue(record, item.key));
-  const hasCompleteRating = values.every((value) => value !== null);
-
-  return hasCompleteRating
-    ? values.reduce((sum, value) => sum + value, 0)
-    : record.score;
-}
-
-function renderRatingStandard(record) {
-  return `
-    <div class="rating-standard-grid">
-      ${RATING_STANDARD_ITEMS.map((item) => {
-        const value = getRatingValue(record, item.key);
-
-        return `
-          <div class="rating-standard-item">
-            <span>${escapeHtml(item.label)}</span>
-            <strong>${value === null ? "未評価" : `${escapeHtml(value)}/10`}</strong>
-          </div>
-        `;
-      }).join("")}
-    </div>
-    <div class="rating-standard-total">
-      <span>AHE SCORE</span>
-      <strong>${escapeHtml(getRatingTotal(record))}/100</strong>
-    </div>
-  `;
-}
-
 function getCommunityReviews(record) {
   return Array.isArray(record.communityReviews) ? record.communityReviews : [];
 }
@@ -537,127 +514,37 @@ function getCommunityScore(reviews) {
     : null;
 }
 
-function getCategoryAverage(reviews, item) {
-  const values = reviews.map((review) => getReviewRatingValue(review, item)).filter((value) => value !== null);
-
-  return values.length
-    ? Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10
-    : null;
-}
-
-function renderMeter(value, max = 10) {
-  const percent = value == null ? 0 : Math.max(0, Math.min(100, (value / max) * 100));
-
+function renderWorkPrimaryFacts(record, productId, performers, maker, release, metadata) {
   return `
-    <span class="rating-meter" aria-hidden="true">
-      <span style="width: ${percent}%"></span>
-    </span>
-  `;
-}
-
-function renderScoreSummary(record) {
-  const reviews = getCommunityReviews(record);
-  const communityScore = getCommunityScore(reviews);
-
-  if (communityScore === null) {
-    return `
-      <section class="detail-section score-summary" aria-labelledby="score-summary-title">
-        <h2 id="score-summary-title">AHE Score</h2>
-        <p class="empty-state">No community score yet</p>
-      </section>
-    `;
-  }
-
-  return `
-    <section class="detail-section score-summary" aria-labelledby="score-summary-title">
-      <h2 id="score-summary-title">AHE Score</h2>
-      <div class="community-score-value">${escapeHtml(communityScore)}/100</div>
-      <p>Based on ${escapeHtml(reviews.length)} community review${reviews.length === 1 ? "" : "s"}</p>
-    </section>
-  `;
-}
-
-function renderRatingBreakdown(record) {
-  const reviews = getCommunityReviews(record);
-  const scores = reviews.map(getReviewScore).filter((score) => score !== null);
-  const buckets = [
-    { label: "90-100", min: 90, max: 100 },
-    { label: "80-89", min: 80, max: 89 },
-    { label: "70-79", min: 70, max: 79 },
-    { label: "60-69", min: 60, max: 69 },
-    { label: "Below 60", min: 0, max: 59 }
-  ];
-
-  return `
-    <section class="detail-section" aria-labelledby="rating-breakdown-title">
-      <h2 id="rating-breakdown-title">Rating Breakdown</h2>
-      <div class="review-breakdown">
-        ${buckets.map((bucket) => {
-          const count = scores.filter((score) => score >= bucket.min && score <= bucket.max).length;
-          const percent = scores.length ? Math.round((count / scores.length) * 100) : 0;
-
-          return `
-            <div class="breakdown-row">
-              <span>${escapeHtml(bucket.label)}</span>
-              ${renderMeter(percent, 100)}
-              <strong>${escapeHtml(percent)}%</strong>
-            </div>
-          `;
-        }).join("")}
+    <dl class="work-primary-facts">
+      <div>
+        <dt>Performer</dt>
+        <dd>${renderEntityLinks(performers, "character") || "Unrecorded"}</dd>
       </div>
-    </section>
-  `;
-}
-
-function renderCategoryAverage(record) {
-  const reviews = getCommunityReviews(record);
-
-  if (reviews.length === 0) {
-    return `
-      <section class="detail-section" aria-labelledby="category-average-title">
-        <h2 id="category-average-title">Category Average</h2>
-        <p class="empty-state">No community ratings yet</p>
-      </section>
-    `;
-  }
-
-  return `
-    <section class="detail-section" aria-labelledby="category-average-title">
-      <h2 id="category-average-title">Category Average</h2>
-      <p class="section-note">AHE LAB Rating Standard v1.0</p>
-      <div class="category-average-grid">
-        ${RATING_STANDARD_ITEMS.map((item) => {
-          const average = getCategoryAverage(reviews, item);
-
-          return `
-            <div class="category-average-item">
-              <span>${escapeHtml(item.label)}</span>
-              <div>
-                ${renderMeter(average)}
-                <strong>${average === null ? "未評価" : `${escapeHtml(average)}/10`}</strong>
-              </div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    </section>
-  `;
-}
-
-function renderReviewRatingList(review) {
-  return `
-    <dl class="review-rating-list">
-      ${RATING_STANDARD_ITEMS.map((item) => {
-        const value = getReviewRatingValue(review, item);
-
-        return `
-          <div>
-            <dt>${escapeHtml(item.label)}</dt>
-            <dd>${value === null ? "未評価" : `${escapeHtml(value)}/10`}</dd>
-          </div>
-        `;
-      }).join("")}
+      ${renderMetaItem("Maker", maker, `circle.html?name=${encodeParam(record.circle)}`)}
+      ${renderMetaItem("Release Date", release)}
+      ${renderMetaItem("Product ID", productId)}
+      ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
     </dl>
+  `;
+}
+
+function renderWorkScoreBlock(communityScore, communityReviews) {
+  return `
+    <div class="work-score-block">
+      <span>AHE Score</span>
+      <strong>${communityScore === null ? "NR" : `${escapeHtml(communityScore)}/100`}</strong>
+      <small>${communityScore === null ? "No score yet" : `${escapeHtml(communityReviews.length)} review${communityReviews.length === 1 ? "" : "s"}`}</small>
+    </div>
+  `;
+}
+
+function renderRelatedWorksSection(relatedRecords) {
+  return `
+    <section class="detail-section work-related-section" aria-labelledby="related-works-title">
+      <h2 id="related-works-title">Related Works</h2>
+      ${renderCompactWorkList(relatedRecords)}
+    </section>
   `;
 }
 
@@ -704,7 +591,7 @@ function renderCommunityReviews(record) {
 
   return `
     <section class="detail-section" aria-labelledby="community-reviews-title">
-      <h2 id="community-reviews-title">Community Reviews</h2>
+      <h2 id="community-reviews-title">Reviews</h2>
       ${reviews.length === 0 ? '<p class="empty-state">No community reviews yet</p>' : reviews.map((review) => {
         const score = getReviewScore(review);
 
@@ -718,7 +605,6 @@ function renderCommunityReviews(record) {
               <time datetime="${escapeHtml(review.createdAt)}">${escapeHtml(review.createdAt)}</time>
             </header>
             <p class="review-score">AHE Score: ${score === null ? "未評価" : `${escapeHtml(score)}/100`}</p>
-            ${renderReviewRatingList(review)}
             <div class="review-comment">
               <h4>Comment</h4>
               <p>${escapeHtml(review.comment || "No comment recorded.")}</p>
@@ -857,8 +743,8 @@ function renderWorkGraphSection(records, record, relatedRecords) {
 
   return `
     <section class="detail-section knowledge-graph-section" aria-labelledby="knowledge-graph-title">
-      <h2 id="knowledge-graph-title">Knowledge Graph</h2>
-      <p class="section-note">この作品から演者、サークル、タグ、関連作品へ辿るための接続点です。</p>
+      <h2 id="knowledge-graph-title">Related Discovery</h2>
+      <p class="section-note">作品探索を補助する関連リンクです。</p>
       <div class="graph-grid">
         <article>
           <h3>Related Works</h3>
@@ -1007,7 +893,7 @@ function renderCategorizedTags(record) {
 
 // Page renderers.
 function renderHomePreview(records) {
-  const previewRecords = sortRecords(records, "score").slice(0, 4);
+  const previewRecords = sortRecords(records, "score").slice(0, 6);
   const latestRecords = sortRecords(records, "newest").slice(0, 3);
   const randomRecord = records[Math.floor((new Date().getDate() - 1) % records.length)];
   const grid = document.querySelector("#record-grid");
@@ -1021,11 +907,6 @@ function renderHomePreview(records) {
   const clearSearch = document.querySelector("#clear-search");
   const tagCloud = document.querySelector("#tag-cloud");
   const resultCount = document.querySelector("#result-count");
-  const entryCount = document.querySelector("#entry-count");
-  const tagCount = document.querySelector("#tag-count");
-  const circleCount = document.querySelector("#circle-count");
-  const characterCount = document.querySelector("#character-count");
-  const latestAddedDate = document.querySelector("#latest-added-date");
   const sortRecordsInput = document.querySelector("#sort-records");
   const homeState = {
     query: "",
@@ -1036,38 +917,32 @@ function renderHomePreview(records) {
   function renderHomeRecords() {
     const filteredRecords = sortRecords(filterRecords(previewRecords, homeState), homeState.sortBy);
 
-    resultCount.textContent = `${filteredRecords.length} records`;
+    resultCount.textContent = formatWorkCount(filteredRecords.length);
     grid.innerHTML = renderRecordGrid(filteredRecords);
   }
 
   function renderHomeTags() {
-    const tags = getAllTags(previewRecords);
+    const tags = ["all", ...getPopularTags(previewRecords).slice(0, 10).map((tag) => tag.name)];
 
     tagCloud.innerHTML = tags.map((tag) => `
       <button class="tag-button${tag === homeState.activeTag ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
         ${escapeHtml(tag)}
       </button>
     `).join("");
-
-    tagCount.textContent = getAllTags(records).length - 1;
   }
 
   if (!grid || !searchInput || !tagCloud) {
     return;
   }
 
-  entryCount.textContent = records.length;
-  circleCount.textContent = getAllCircles(records).length;
-  characterCount.textContent = getAllCharacters(records).length;
-  latestAddedDate.textContent = getLatestRecord(records).publishedAt;
   latestGrid.innerHTML = renderRecordGrid(latestRecords);
-  popularTags.innerHTML = getPopularTags(records).map((tag) => `
+  popularTags.innerHTML = getPopularTags(records).slice(0, 12).map((tag) => `
     <a class="tag-button" href="tag.html?name=${encodeParam(tag.name)}">${escapeHtml(tag.name)} <span>${tag.count}</span></a>
   `).join("");
-  popularCircles.innerHTML = getPopularCircles(records).map((circle) => `
+  popularCircles.innerHTML = getPopularCircles(records).slice(0, 8).map((circle) => `
     <a class="tag-button" href="circle.html?name=${encodeParam(circle.name)}">${escapeHtml(circle.name)} <span>${circle.count}</span></a>
   `).join("");
-  popularPerformers.innerHTML = getPopularCharacters(records).map((performer) => `
+  popularPerformers.innerHTML = getPopularCharacters(records).slice(0, 8).map((performer) => `
     <a class="tag-button" href="character.html?name=${encodeParam(performer.name)}">${escapeHtml(performer.name)} <span>${performer.count}</span></a>
   `).join("");
   recentReviews.innerHTML = renderRecentReviewFeed(records);
@@ -1118,89 +993,46 @@ function renderDatabasePage(records) {
   });
 
   const app = document.querySelector("#app");
-  const average = Math.round(records.reduce((sum, record) => sum + record.score, 0) / records.length);
 
   app.innerHTML = `
-    <section class="database-hero" aria-labelledby="database-page-title">
-      <div>
-        ${renderBreadcrumb([{ label: "Database" }])}
-        <p class="eyebrow">Phase 3 / JSON Source Database</p>
-        <h1 id="database-page-title">Expression Records</h1>
-        <p>
-          JSONを唯一のデータソースとして、作品詳細、タグ、サークル、キャラクター分類まで
-          自動生成する静的データベースです。
-        </p>
+    <section class="database-search-page" aria-labelledby="database-page-title">
+      ${renderBreadcrumb([{ label: "Database" }])}
+      <header class="database-search-header">
+        <p class="eyebrow">Title Search</p>
+        <h1 id="database-page-title">Find Works</h1>
+        <form class="search-bar database-search" role="search">
+          <label class="visually-hidden" for="db-search">Search works</label>
+          <input id="db-search" type="search" placeholder="Search title, performer, maker, tag..." autocomplete="off">
+          <button type="reset" id="db-clear-search">Clear</button>
+        </form>
+      </header>
+
+      <div class="database-toolbar database-page-toolbar" aria-live="polite">
+        <div>
+          <h2 id="database-results-title">Search Results</h2>
+          <p><span id="db-result-count">0 works</span><span id="db-selected-tags">All tags</span></p>
+        </div>
+        <label>
+          <span>Sort by</span>
+          <select id="db-sort-records" aria-label="Sort records">
+            <option value="newest">Release Date</option>
+            <option value="score">AHE Score</option>
+            <option value="title">Title</option>
+          </select>
+        </label>
       </div>
 
-      <div class="database-metrics" aria-label="Database metrics">
-        <article><span id="db-total-count">${records.length}</span><p>Total Records</p></article>
-        <article><span id="db-average-score">${average}</span><p>Average Score</p></article>
-        <article><span id="db-active-filter">All</span><p>Active Tag</p></article>
-      </div>
-    </section>
-
-    <section class="database-workspace" aria-labelledby="database-controls-title">
-      <aside class="database-sidebar" id="database-tags">
-        <div class="sidebar-heading">
-          <p class="eyebrow">Tags</p>
-          <h2 id="database-controls-title">Filter</h2>
-        </div>
-        <div class="tag-cloud database-tag-cloud" id="db-tag-cloud" aria-label="Filter records by tag"></div>
-      </aside>
-
-      <section class="database-results" aria-labelledby="database-results-title">
-        <div class="database-control-panel">
-          <div>
-            <p class="eyebrow">Search</p>
-            <h2 id="database-results-title">Archive Browser</h2>
-          </div>
-
-          <form class="search-bar database-search" role="search">
-            <label class="visually-hidden" for="db-search">Search database</label>
-            <input id="db-search" type="search" placeholder="Search title, circle, character, tag, note..." autocomplete="off">
-            <button type="reset" id="db-clear-search">Clear</button>
-          </form>
-
-          <div class="advanced-search" aria-label="Advanced search filters">
-            <label>
-              <span>Tag Mode</span>
-              <select id="db-tag-mode">
-                <option value="and">AND</option>
-                <option value="or">OR</option>
-              </select>
-            </label>
-            <label>
-              <span>Score Min</span>
-              <input id="db-score-min" type="number" min="0" max="100" placeholder="0">
-            </label>
-            <label>
-              <span>Score Max</span>
-              <input id="db-score-max" type="number" min="0" max="100" placeholder="100">
-            </label>
-            <label>
-              <span>Circle</span>
-              <input id="db-circle-filter" type="search" placeholder="Circle name">
-            </label>
-            <label>
-              <span>Character</span>
-              <input id="db-character-filter" type="search" placeholder="Character name">
-            </label>
-          </div>
-
-          <p class="selected-filter-line" id="db-selected-tags">Selected tags: all</p>
-
-          <div class="database-toolbar database-page-toolbar" aria-live="polite">
-            <span id="db-result-count">0 records</span>
-            <label>
-              <span class="visually-hidden">Sort records</span>
-              <select id="db-sort-records" aria-label="Sort records">
-                <option value="newest">新着</option>
-                <option value="score">AHE SCORE</option>
-                <option value="title">タイトル</option>
-              </select>
-            </label>
-          </div>
-        </div>
+      <section class="database-workspace" aria-labelledby="database-results-title">
+        <aside class="database-sidebar" id="database-tags">
+          <details>
+            <summary>Filters</summary>
+            <div class="sidebar-heading">
+              <p class="eyebrow">Tags</p>
+              <h2 id="database-controls-title">Popular Tags</h2>
+            </div>
+            <div class="tag-cloud database-tag-cloud" id="db-tag-cloud" aria-label="Filter records by tag"></div>
+          </details>
+        </aside>
 
         <div class="database-grid" id="db-record-grid"></div>
       </section>
@@ -1214,26 +1046,19 @@ function renderDatabasePage(records) {
   const clearSearch = document.querySelector("#db-clear-search");
   const tagCloud = document.querySelector("#db-tag-cloud");
   const resultCount = document.querySelector("#db-result-count");
-  const activeFilter = document.querySelector("#db-active-filter");
   const sortRecordsInput = document.querySelector("#db-sort-records");
-  const tagModeInput = document.querySelector("#db-tag-mode");
-  const scoreMinInput = document.querySelector("#db-score-min");
-  const scoreMaxInput = document.querySelector("#db-score-max");
-  const circleFilterInput = document.querySelector("#db-circle-filter");
-  const characterFilterInput = document.querySelector("#db-character-filter");
   const selectedTagsLine = document.querySelector("#db-selected-tags");
 
   function renderDatabaseRecords() {
     const filteredRecords = sortRecords(filterRecords(databaseState.records, databaseState), databaseState.sortBy);
 
-    resultCount.textContent = `${filteredRecords.length} records`;
-    activeFilter.textContent = databaseState.selectedTags.length ? databaseState.selectedTags.join(", ") : "All";
-    selectedTagsLine.textContent = `Selected tags: ${databaseState.selectedTags.length ? databaseState.selectedTags.join(", ") : "all"}`;
+    resultCount.textContent = formatWorkCount(filteredRecords.length);
+    selectedTagsLine.textContent = databaseState.selectedTags.length ? ` / Tags: ${databaseState.selectedTags.join(", ")}` : " / All tags";
     grid.innerHTML = renderRecordGrid(filteredRecords);
   }
 
   function renderDatabaseTags() {
-    const tags = getAllTags(databaseState.records);
+    const tags = ["all", ...getPopularTags(databaseState.records).slice(0, 18).map((tag) => tag.name)];
 
     tagCloud.innerHTML = tags.map((tag) => `
       <button class="tag-button${databaseState.selectedTags.includes(tag) || (tag === "all" && databaseState.selectedTags.length === 0) ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
@@ -1259,21 +1084,6 @@ function renderDatabasePage(records) {
   sortRecordsInput.addEventListener("change", (event) => {
     databaseState.sortBy = event.target.value;
     renderDatabaseRecords();
-  });
-
-  tagModeInput.addEventListener("change", (event) => {
-    databaseState.tagMode = event.target.value;
-    renderDatabaseRecords();
-  });
-
-  [scoreMinInput, scoreMaxInput, circleFilterInput, characterFilterInput].forEach((input) => {
-    input.addEventListener("input", () => {
-      databaseState.scoreMin = scoreMinInput.value;
-      databaseState.scoreMax = scoreMaxInput.value;
-      databaseState.circle = circleFilterInput.value;
-      databaseState.character = characterFilterInput.value;
-      renderDatabaseRecords();
-    });
   });
 
   tagCloud.addEventListener("click", (event) => {
@@ -1316,8 +1126,8 @@ function renderWorkPage(records) {
   const productId = metadata.productId || "Unrecorded";
   const communityReviews = record ? getCommunityReviews(record) : [];
   const communityScore = getCommunityScore(communityReviews);
-  const thumbnail = record.thumbnail || {
-    label: record.id,
+  const thumbnail = record?.thumbnail || {
+    label: record?.id || "AHE LAB",
     accent: "#7C5CFF",
     background: "#111115"
   };
@@ -1357,29 +1167,17 @@ function renderWorkPage(records) {
       ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
       <header class="work-overview" aria-labelledby="work-title">
         <div class="work-cover-placeholder" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
-          <span>${escapeHtml(thumbnail.label || record.id)}</span>
-          <small>Cover Image</small>
+          <span>${escapeHtml(productId)}</span>
+          <small>Package Image</small>
         </div>
         <div class="work-overview-body">
-          <p class="eyebrow">Community Archive / ${escapeHtml(record.id)}</p>
+          <p class="eyebrow">Work</p>
           <h1 id="work-title">${escapeHtml(record.title)}</h1>
-          <div class="work-community-score">
-            <span>Community Score</span>
-            <strong>${communityScore === null ? "No community score yet" : `${escapeHtml(communityScore)}/100`}</strong>
-            ${communityScore === null ? "" : `<small>Based on ${escapeHtml(communityReviews.length)} community review${communityReviews.length === 1 ? "" : "s"}</small>`}
+          <div class="work-main-grid">
+            ${renderWorkPrimaryFacts(record, productId, performers, maker, release, metadata)}
+            ${renderWorkScoreBlock(communityScore, communityReviews)}
           </div>
-          <div class="record-tags work-header-tags">${renderTagLinks(record.tags)}</div>
-          <dl class="work-header-meta">
-            ${renderMetaItem("Product ID", productId)}
-            <div>
-              <dt>Performer</dt>
-              <dd>${renderEntityLinks(performers, "character") || "Unrecorded"}</dd>
-            </div>
-            ${renderMetaItem("Maker / Circle", maker, `circle.html?name=${encodeParam(record.circle)}`)}
-            ${renderMetaItem("Release", release)}
-            ${renderMetaItem("Runtime", getRecordRuntime(record))}
-            ${renderMetaItem("Verification", record.verification || metadata.verification || record.status)}
-          </dl>
+          <div class="record-tags work-header-tags">${renderTagLinksLimited(record.tags, 10)}</div>
           ${renderExternalLinkPills(record)}
           <button class="favorite-button" id="favorite-button" type="button" data-id="${escapeHtml(record.id)}">
             ${isFavorite(record.id) ? "Remove Favorite" : "Add Favorite"}
@@ -1397,20 +1195,8 @@ function renderWorkPage(records) {
         <p>${escapeHtml(archiveNote)}</p>
       </section>
 
-      ${renderScoreSummary(record)}
-      ${renderRatingBreakdown(record)}
-      ${renderWorkGraphSection(records, record, relatedRecords)}
-
-      <section class="detail-section review-cta" aria-labelledby="review-cta-title">
-        <h2 id="review-cta-title">Write a Community Review</h2>
-        <p>AHE LABは訪問者のレビューによってスコアが育つアーカイブです。この作品を分析して、評価を投稿してください。</p>
-        <button id="write-review-button" type="button">Write Review</button>
-        <p class="review-cta-message" id="review-cta-message" role="status" aria-live="polite"></p>
-      </section>
-
       ${renderCommunityReviews(record)}
-      ${renderOfficialArchiveNote(record)}
-      ${renderExternalLinks(record)}
+      ${renderRelatedWorksSection(relatedRecords)}
     </article>
   `;
 
@@ -1419,9 +1205,6 @@ function renderWorkPage(records) {
     event.currentTarget.textContent = favorite ? "Remove Favorite" : "Add Favorite";
   });
 
-  document.querySelector("#write-review-button").addEventListener("click", () => {
-    document.querySelector("#review-cta-message").textContent = "Review submission is not available yet.";
-  });
 }
 
 function renderListingPage(records, type) {
