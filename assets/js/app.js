@@ -3,6 +3,7 @@ const DATA_PATH = "data/ahe-records.json";
 // Shared state for the database page filters.
 const databaseState = {
   query: "",
+  type: "all",
   activeTag: "all",
   selectedTags: [],
   tagMode: "and",
@@ -15,6 +16,59 @@ const databaseState = {
 };
 
 const FAVORITE_KEY = "ahe-lab-favorites";
+const TYPE_FILTERS = ["アニメ", "イラスト", "マンガ", "アダルト", "SNS"];
+const CORE_TAG_GROUPS = {
+  "表情": ["アヘ顔", "白目", "寄り目", "舌出し", "ぴえん"],
+  "身体反応": ["よだれ", "涙", "汗", "火照り"],
+  "精神状態": ["快楽", "愉悦", "恍惚", "服従", "忠誠", "抵抗", "絶望", "催眠"],
+  "シチュエーション": ["ドラッグ", "キメセク", "ダブルピース"]
+};
+const HOME_POPULAR_TAGS = ["アヘ顔", "白目", "涙", "汗", "火照り", "舌出し", "ダブルピース", "ドラッグ", "キメセク", "ぴえん", "愉悦", "恍惚", "忠誠", "抵抗"];
+const CORE_TAGS = new Set(Object.values(CORE_TAG_GROUPS).flat());
+const HIDDEN_TAGS = new Set([
+  "archive-first",
+  "classification",
+  "database",
+  "dataset",
+  "metadata",
+  "taxonomy",
+  "research",
+  "researching",
+  "score",
+  "submission",
+  "manifesto",
+  "manifest",
+  "revival",
+  "forum",
+  "composition",
+  "contrast",
+  "cover-art",
+  "derivative",
+  "iconic",
+  "interface",
+  "linework",
+  "minimal",
+  "panel-study",
+  "symbolic",
+  "animation",
+  "illustration",
+  "manga",
+  "video",
+  "web"
+]);
+const TAG_DISPLAY_NAMES = {
+  "ahegao": "アヘ顔",
+  "white-eyes": "白目",
+  "cross-eyes": "寄り目",
+  "gaze": "寄り目",
+  "tongue-out": "舌出し",
+  "drool": "よだれ",
+  "double-peace": "ダブルピース",
+  "hypnosis": "催眠",
+  "ぴえん系": "ぴえん",
+  "ドラッグ演出": "ドラッグ",
+  "キメセク演出": "キメセク"
+};
 const RATING_STANDARD_ITEMS = [
   { key: "eyeFocus", label: "寄り目・白目" },
   { key: "tongueOut", label: "舌出し" },
@@ -40,6 +94,49 @@ function escapeHtml(value) {
 
 function normalize(value) {
   return String(value ?? "").trim().toLowerCase();
+}
+
+function normalizeTagDisplay(tag) {
+  return TAG_DISPLAY_NAMES[tag] || TAG_DISPLAY_NAMES[normalize(tag)] || tag;
+}
+
+function isHiddenTag(tag) {
+  return HIDDEN_TAGS.has(normalize(tag));
+}
+
+function isCoreTag(tag) {
+  return CORE_TAGS.has(normalizeTagDisplay(tag)) && !isHiddenTag(tag);
+}
+
+function getVisibleTags(tags = []) {
+  return [...new Set(tags.map(normalizeTagDisplay).filter((tag) => CORE_TAGS.has(tag)))];
+}
+
+function recordMatchesDisplayTag(record, displayTag) {
+  return getVisibleTags(record.tags).includes(normalizeTagDisplay(displayTag));
+}
+
+function getRecordType(record) {
+  const medium = normalize(record.medium || record.type || record.metadata?.medium);
+  const tags = new Set((record.tags || []).map(normalize));
+
+  if (medium.includes("animation") || tags.has("animation")) {
+    return "アニメ";
+  }
+
+  if (medium.includes("illustration") || medium.includes("cover") || tags.has("illustration") || tags.has("cover-art")) {
+    return "イラスト";
+  }
+
+  if (medium.includes("manga") || tags.has("manga")) {
+    return "マンガ";
+  }
+
+  if (medium.includes("web") || tags.has("web") || tags.has("forum")) {
+    return "SNS";
+  }
+
+  return "アダルト";
 }
 
 function encodeParam(value) {
@@ -94,10 +191,13 @@ function setJsonLd(data) {
 
 // Data accessors and aggregation helpers. All pages derive from data/ahe-records.json.
 function getRecordSearchText(record) {
+  const visibleTags = getVisibleTags(record.tags);
+
   return normalize([
     record.id,
     record.title,
     record.medium,
+    getRecordType(record),
     record.year,
     record.publishedAt,
     record.score,
@@ -106,7 +206,7 @@ function getRecordSearchText(record) {
     record.circle,
     record.note,
     ...record.characters,
-    ...record.tags
+    ...visibleTags
   ].join(" "));
 }
 
@@ -138,7 +238,7 @@ function toggleFavorite(id) {
 }
 
 function getAllTags(records) {
-  return ["all", ...new Set(records.flatMap((record) => record.tags))].sort();
+  return ["all", ...new Set(records.flatMap((record) => getVisibleTags(record.tags)))].sort();
 }
 
 function getAllCircles(records) {
@@ -150,7 +250,7 @@ function getAllCharacters(records) {
 }
 
 function getPopularTags(records, limit = 8) {
-  return getPopularValues(records.flatMap((record) => record.tags), limit);
+  return getPopularValues(records.flatMap((record) => getVisibleTags(record.tags)), limit);
 }
 
 function getPopularCircles(records, limit = 8) {
@@ -252,19 +352,21 @@ function filterRecords(records, state) {
   const scoreMax = state.scoreMax === "" || state.scoreMax == null ? 100 : Number(state.scoreMax);
   const selectedCircle = normalize(state.circle);
   const selectedCharacter = normalize(state.character);
+  const selectedType = state.type || "all";
 
   return records.filter((record) => {
     const matchesSearch = !query || getRecordSearchText(record).includes(query);
-    const matchesLegacyTag = state.activeTag === "all" || record.tags.includes(state.activeTag);
+    const matchesType = selectedType === "all" || getRecordType(record) === selectedType;
+    const matchesLegacyTag = state.activeTag === "all" || recordMatchesDisplayTag(record, state.activeTag);
     const matchesTags = selectedTags.length === 0
       || (state.tagMode === "or"
-        ? selectedTags.some((tag) => record.tags.includes(tag))
-        : selectedTags.every((tag) => record.tags.includes(tag)));
+        ? selectedTags.some((tag) => recordMatchesDisplayTag(record, tag))
+        : selectedTags.every((tag) => recordMatchesDisplayTag(record, tag)));
     const matchesScore = record.score >= scoreMin && record.score <= scoreMax;
     const matchesCircle = !selectedCircle || normalize(record.circle).includes(selectedCircle);
     const matchesCharacter = !selectedCharacter || record.characters.some((character) => normalize(character).includes(selectedCharacter));
 
-    return matchesSearch && matchesLegacyTag && matchesTags && matchesScore && matchesCircle && matchesCharacter;
+    return matchesSearch && matchesType && matchesLegacyTag && matchesTags && matchesScore && matchesCircle && matchesCharacter;
   });
 }
 
@@ -295,15 +397,13 @@ function renderLayout(activePage) {
         </a>
 
         <nav class="site-nav" aria-label="Primary navigation">
+          <a href="index.html" ${activePage === "home" ? 'aria-current="page"' : ""}>Home</a>
           <a href="database.html" ${activePage === "database" ? 'aria-current="page"' : ""}>Database</a>
           <a href="character.html" ${activePage === "character" ? 'aria-current="page"' : ""}>Characters</a>
           <a href="circle.html" ${activePage === "circle" ? 'aria-current="page"' : ""}>Circles</a>
           <a href="tag.html" ${activePage === "tag" ? 'aria-current="page"' : ""}>Tags</a>
-          <a href="about.html#research">Research</a>
           <a href="ranking.html" ${activePage === "ranking" ? 'aria-current="page"' : ""}>Ranking</a>
           <a href="about.html" ${activePage === "about" ? 'aria-current="page"' : ""}>About</a>
-          <a href="https://github.com/ahelab/ahe-lab" target="_blank" rel="noopener">Github</a>
-          <a href="https://x.com/" target="_blank" rel="noopener">X</a>
         </nav>
       </header>
     `;
@@ -314,15 +414,13 @@ function renderLayout(activePage) {
       <footer class="site-footer">
         <p>© 2026 AHE LAB. Expression Archive Institute.</p>
         <div>
+          <a href="index.html">Home</a>
           <a href="database.html">Database</a>
           <a href="character.html">Characters</a>
           <a href="circle.html">Circles</a>
           <a href="tag.html">Tags</a>
-          <a href="about.html#research">Research</a>
           <a href="ranking.html">Ranking</a>
           <a href="about.html">About</a>
-          <a href="stats.html">Stats</a>
-          <a href="sitemap.html">Sitemap</a>
         </div>
       </footer>
     `;
@@ -370,14 +468,15 @@ function renderCountedLinks(values, page) {
 }
 
 function renderTagLinks(tags) {
-  return tags.map((tag) => `
+  return getVisibleTags(tags).map((tag) => `
     <a href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
   `).join("");
 }
 
 function renderTagLinksLimited(tags, limit = 6) {
-  const visibleTags = tags.slice(0, limit);
-  const hiddenCount = Math.max(0, tags.length - visibleTags.length);
+  const displayTags = getVisibleTags(tags);
+  const visibleTags = displayTags.slice(0, limit);
+  const hiddenCount = Math.max(0, displayTags.length - visibleTags.length);
 
   return `
     ${renderTagLinks(visibleTags)}
@@ -442,6 +541,34 @@ function renderRecordGrid(records) {
   }
 
   return records.map((record) => renderRecordCard(record, "database")).join("");
+}
+
+function renderHomeShelfCard(record) {
+  const thumbnail = record.thumbnail || {
+    label: record.id,
+    accent: "#7C5CFF",
+    background: "#111115"
+  };
+  const communityScore = getRecordCommunityScore(record);
+
+  return `
+    <a class="home-work-card" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}">
+      <span class="home-work-cover" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
+        <small>${escapeHtml(record.metadata?.productId || record.productId || record.id)}</small>
+        <strong>Package Image</strong>
+      </span>
+      <span class="home-work-title">${escapeHtml(record.title)}</span>
+      <span class="home-work-score">${communityScore === null ? "NR" : `${escapeHtml(communityScore)}/100`}</span>
+    </a>
+  `;
+}
+
+function renderHomeShelf(records) {
+  if (records.length === 0) {
+    return '<p class="empty-state">No works yet.</p>';
+  }
+
+  return records.map(renderHomeShelfCard).join("");
 }
 
 function getRecordPerformers(record) {
@@ -733,7 +860,7 @@ function renderWorkGraphSection(records, record, relatedRecords) {
   const relatedPerformerRecords = records.filter((item) => item.id !== record.id
     && getRecordPerformers(item).some((performer) => performers.includes(performer)));
   const relatedTagValues = getPopularValues(
-    relatedRecords.flatMap((item) => item.tags).filter((tag) => !record.tags.includes(tag)),
+    relatedRecords.flatMap((item) => getVisibleTags(item.tags)).filter((tag) => !getVisibleTags(record.tags).includes(tag)),
     8
   );
   const relatedPerformerValues = getPopularValues(
@@ -769,9 +896,9 @@ function renderWorkGraphSection(records, record, relatedRecords) {
 
 function getNeighborRecordsByTags(records, matchedRecords) {
   const matchedIds = new Set(matchedRecords.map((record) => record.id));
-  const matchedTags = new Set(matchedRecords.flatMap((record) => record.tags));
+  const matchedTags = new Set(matchedRecords.flatMap((record) => getVisibleTags(record.tags)));
 
-  return records.filter((record) => !matchedIds.has(record.id) && record.tags.some((tag) => matchedTags.has(tag)));
+  return records.filter((record) => !matchedIds.has(record.id) && getVisibleTags(record.tags).some((tag) => matchedTags.has(tag)));
 }
 
 function renderEntityGraphPage(records, type, name, matchedRecords) {
@@ -782,7 +909,7 @@ function renderEntityGraphPage(records, type, name, matchedRecords) {
   };
   const neighborRecords = getNeighborRecordsByTags(records, matchedRecords);
   const relatedTags = getPopularValues(
-    matchedRecords.flatMap((record) => record.tags).filter((tag) => type !== "tag" || tag !== name),
+    matchedRecords.flatMap((record) => getVisibleTags(record.tags)).filter((tag) => type !== "tag" || tag !== name),
     10
   );
   const relatedCircles = getPopularValues(
@@ -881,7 +1008,7 @@ function renderMetadataRows(record) {
 }
 
 function renderCategorizedTags(record) {
-  const categories = record.tagCategories || { general: record.tags };
+  const categories = record.tagCategories || { general: getVisibleTags(record.tags) };
 
   return Object.entries(categories).map(([category, tags]) => `
     <section class="tag-category" aria-label="${escapeHtml(category)} tags">
@@ -893,90 +1020,34 @@ function renderCategorizedTags(record) {
 
 // Page renderers.
 function renderHomePreview(records) {
-  const previewRecords = sortRecords(records, "score").slice(0, 6);
-  const latestRecords = sortRecords(records, "newest").slice(0, 3);
-  const randomRecord = records[Math.floor((new Date().getDate() - 1) % records.length)];
-  const grid = document.querySelector("#record-grid");
-  const latestGrid = document.querySelector("#home-latest-grid");
+  const shelfLimit = 12;
+  const latestShelf = document.querySelector("#home-latest-shelf");
+  const highScoreShelf = document.querySelector("#home-high-score-shelf");
   const popularTags = document.querySelector("#home-popular-tags");
-  const popularCircles = document.querySelector("#home-popular-circles");
-  const popularPerformers = document.querySelector("#home-popular-performers");
-  const recentReviews = document.querySelector("#home-recent-reviews");
-  const randomWork = document.querySelector("#home-random-work");
-  const searchInput = document.querySelector("#archive-search");
-  const clearSearch = document.querySelector("#clear-search");
-  const tagCloud = document.querySelector("#tag-cloud");
-  const resultCount = document.querySelector("#result-count");
-  const sortRecordsInput = document.querySelector("#sort-records");
-  const homeState = {
-    query: "",
-    activeTag: "all",
-    sortBy: "score"
+  const typeShelfMap = {
+    "アニメ": document.querySelector("#home-type-anime-shelf"),
+    "マンガ": document.querySelector("#home-type-manga-shelf"),
+    "イラスト": document.querySelector("#home-type-illustration-shelf"),
+    "アダルト": document.querySelector("#home-type-adult-shelf"),
+    "SNS": document.querySelector("#home-type-sns-shelf")
   };
 
-  function renderHomeRecords() {
-    const filteredRecords = sortRecords(filterRecords(previewRecords, homeState), homeState.sortBy);
-
-    resultCount.textContent = formatWorkCount(filteredRecords.length);
-    grid.innerHTML = renderRecordGrid(filteredRecords);
-  }
-
-  function renderHomeTags() {
-    const tags = ["all", ...getPopularTags(previewRecords).slice(0, 10).map((tag) => tag.name)];
-
-    tagCloud.innerHTML = tags.map((tag) => `
-      <button class="tag-button${tag === homeState.activeTag ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
-        ${escapeHtml(tag)}
-      </button>
-    `).join("");
-  }
-
-  if (!grid || !searchInput || !tagCloud) {
+  if (!latestShelf || !highScoreShelf || !popularTags) {
     return;
   }
 
-  latestGrid.innerHTML = renderRecordGrid(latestRecords);
-  popularTags.innerHTML = getPopularTags(records).slice(0, 12).map((tag) => `
-    <a class="tag-button" href="tag.html?name=${encodeParam(tag.name)}">${escapeHtml(tag.name)} <span>${tag.count}</span></a>
-  `).join("");
-  popularCircles.innerHTML = getPopularCircles(records).slice(0, 8).map((circle) => `
-    <a class="tag-button" href="circle.html?name=${encodeParam(circle.name)}">${escapeHtml(circle.name)} <span>${circle.count}</span></a>
-  `).join("");
-  popularPerformers.innerHTML = getPopularCharacters(records).slice(0, 8).map((performer) => `
-    <a class="tag-button" href="character.html?name=${encodeParam(performer.name)}">${escapeHtml(performer.name)} <span>${performer.count}</span></a>
-  `).join("");
-  recentReviews.innerHTML = renderRecentReviewFeed(records);
-  randomWork.innerHTML = renderRecordCard(randomRecord, "preview");
-  renderHomeTags();
-  renderHomeRecords();
+  latestShelf.innerHTML = renderHomeShelf(sortRecords(records, "newest").slice(0, shelfLimit));
+  highScoreShelf.innerHTML = renderHomeShelf(sortByCommunityScore(records).slice(0, shelfLimit));
 
-  searchInput.addEventListener("input", (event) => {
-    homeState.query = event.target.value;
-    renderHomeRecords();
-  });
-
-  clearSearch.addEventListener("click", () => {
-    homeState.query = "";
-    searchInput.value = "";
-    renderHomeRecords();
-  });
-
-  sortRecordsInput.addEventListener("change", (event) => {
-    homeState.sortBy = event.target.value;
-    renderHomeRecords();
-  });
-
-  tagCloud.addEventListener("click", (event) => {
-    const tagButton = event.target.closest("[data-tag]");
-
-    if (!tagButton) {
-      return;
+  Object.entries(typeShelfMap).forEach(([type, shelf]) => {
+    if (shelf) {
+      shelf.innerHTML = renderHomeShelf(sortRecords(records.filter((record) => getRecordType(record) === type), "newest").slice(0, shelfLimit));
     }
-
-    homeState.activeTag = tagButton.dataset.tag;
-    renderHomeTags();
-    renderHomeRecords();
   });
+
+  popularTags.innerHTML = HOME_POPULAR_TAGS.map((tag) => `
+    <a class="tag-button" href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
+  `).join("");
 }
 
 function renderDatabasePage(records) {
@@ -1024,11 +1095,16 @@ function renderDatabasePage(records) {
 
       <section class="database-workspace" aria-labelledby="database-results-title">
         <aside class="database-sidebar" id="database-tags">
-          <details>
+          <details open>
             <summary>Filters</summary>
             <div class="sidebar-heading">
+              <p class="eyebrow">Type</p>
+              <h2>Type Filter</h2>
+            </div>
+            <div class="type-filter" id="db-type-filter" aria-label="Filter records by type"></div>
+            <div class="sidebar-heading">
               <p class="eyebrow">Tags</p>
-              <h2 id="database-controls-title">Popular Tags</h2>
+              <h2 id="database-controls-title">Expression Tags</h2>
             </div>
             <div class="tag-cloud database-tag-cloud" id="db-tag-cloud" aria-label="Filter records by tag"></div>
           </details>
@@ -1044,6 +1120,7 @@ function renderDatabasePage(records) {
   const grid = document.querySelector("#db-record-grid");
   const searchInput = document.querySelector("#db-search");
   const clearSearch = document.querySelector("#db-clear-search");
+  const typeFilter = document.querySelector("#db-type-filter");
   const tagCloud = document.querySelector("#db-tag-cloud");
   const resultCount = document.querySelector("#db-result-count");
   const sortRecordsInput = document.querySelector("#db-sort-records");
@@ -1053,20 +1130,42 @@ function renderDatabasePage(records) {
     const filteredRecords = sortRecords(filterRecords(databaseState.records, databaseState), databaseState.sortBy);
 
     resultCount.textContent = formatWorkCount(filteredRecords.length);
-    selectedTagsLine.textContent = databaseState.selectedTags.length ? ` / Tags: ${databaseState.selectedTags.join(", ")}` : " / All tags";
+    const typeLabel = databaseState.type === "all" ? "All types" : databaseState.type;
+    const tagLabel = databaseState.selectedTags.length ? `Tags: ${databaseState.selectedTags.join(", ")}` : "All tags";
+
+    selectedTagsLine.textContent = ` / ${typeLabel} / ${tagLabel}`;
     grid.innerHTML = renderRecordGrid(filteredRecords);
   }
 
-  function renderDatabaseTags() {
-    const tags = ["all", ...getPopularTags(databaseState.records).slice(0, 18).map((tag) => tag.name)];
+  function renderDatabaseTypes() {
+    const types = ["all", ...TYPE_FILTERS];
 
-    tagCloud.innerHTML = tags.map((tag) => `
-      <button class="tag-button${databaseState.selectedTags.includes(tag) || (tag === "all" && databaseState.selectedTags.length === 0) ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
-        ${escapeHtml(tag)}
+    typeFilter.innerHTML = types.map((type) => `
+      <button class="tag-button type-button${databaseState.type === type ? " is-active" : ""}" type="button" data-type="${escapeHtml(type)}">
+        ${escapeHtml(type === "all" ? "All Types" : type)}
       </button>
     `).join("");
   }
 
+  function renderDatabaseTags() {
+    tagCloud.innerHTML = `
+      <button class="tag-button${databaseState.selectedTags.length === 0 ? " is-active" : ""}" type="button" data-tag="all">
+        All Tags
+      </button>
+      ${Object.entries(CORE_TAG_GROUPS).map(([group, tags]) => `
+        <div class="tag-filter-group">
+          <h3>${escapeHtml(group)}</h3>
+          ${tags.map((tag) => `
+            <button class="tag-button${databaseState.selectedTags.includes(tag) ? " is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+              ${escapeHtml(tag)}
+            </button>
+          `).join("")}
+        </div>
+      `).join("")}
+    `;
+  }
+
+  renderDatabaseTypes();
   renderDatabaseTags();
   renderDatabaseRecords();
 
@@ -1083,6 +1182,18 @@ function renderDatabasePage(records) {
 
   sortRecordsInput.addEventListener("change", (event) => {
     databaseState.sortBy = event.target.value;
+    renderDatabaseRecords();
+  });
+
+  typeFilter.addEventListener("click", (event) => {
+    const typeButton = event.target.closest("[data-type]");
+
+    if (!typeButton) {
+      return;
+    }
+
+    databaseState.type = typeButton.dataset.type;
+    renderDatabaseTypes();
     renderDatabaseRecords();
   });
 
@@ -1148,7 +1259,7 @@ function renderWorkPage(records) {
     "identifier": record.id,
     "name": record.title,
     "datePublished": release,
-    "genre": record.tags,
+    "genre": getVisibleTags(record.tags),
     "creator": maker,
     "character": record.characters,
     "actor": performers,
@@ -1211,6 +1322,7 @@ function renderListingPage(records, type) {
   const name = getQueryParam("name");
   const app = document.querySelector("#app");
   databaseState.records = records;
+  const displayName = type === "tag" ? normalizeTagDisplay(name) : name;
   const titleMap = {
     tag: "Tag",
     circle: "Circle",
@@ -1230,22 +1342,22 @@ function renderListingPage(records, type) {
 
   const matchedRecords = records.filter((record) => {
     if (type === "tag") {
-      return record.tags.includes(name);
+      return recordMatchesDisplayTag(record, displayName);
     }
 
     if (type === "circle") {
-      return record.circle === name;
+      return record.circle === displayName;
     }
 
-    return getRecordPerformers(record).includes(name);
+    return getRecordPerformers(record).includes(displayName);
   });
 
   setMeta(
-    `${name} | AHE LAB ${titleMap[type]}`,
-    `AHE LAB ${type} page for ${name}, generated from the archive JSON data source.`
+    `${displayName} | AHE LAB ${titleMap[type]}`,
+    `AHE LAB ${type} page for ${displayName}, generated from the archive JSON data source.`
   );
 
-  app.innerHTML = renderEntityGraphPage(records, type, name, matchedRecords);
+  app.innerHTML = renderEntityGraphPage(records, type, displayName, matchedRecords);
 }
 
 function renderIndexPage(type, values) {
@@ -1257,7 +1369,7 @@ function renderIndexPage(type, values) {
   const records = databaseState.records || [];
   const countFor = (value) => records.filter((record) => {
     if (type === "tag") {
-      return record.tags.includes(value);
+      return recordMatchesDisplayTag(record, value);
     }
 
     if (type === "circle") {
