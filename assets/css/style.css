@@ -1585,11 +1585,32 @@ h3 {
   min-width: 0;
 }
 
+.home-category-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
 .home-category-block h3 {
-  margin: 0 0 12px;
+  margin: 0;
   color: var(--color-white);
   font-size: 1.12rem;
   line-height: 1.2;
+}
+
+.home-category-heading a {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-category-heading a:hover,
+.home-category-heading a:focus-visible {
+  color: var(--color-white);
 }
 
 .home-shelf-featured {
@@ -1628,25 +1649,49 @@ h3 {
   color: var(--color-white);
 }
 
+.home-shelf-frame {
+  position: relative;
+}
+
 .home-shelf {
   display: grid;
-  grid-auto-columns: minmax(158px, 192px);
+  grid-auto-columns: minmax(132px, calc((100% - 80px) / 6));
   grid-auto-flow: column;
   gap: 16px;
-  min-height: 318px;
-  padding-bottom: 8px;
+  min-height: 286px;
+  padding: 0 48px 4px 0;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline proximity;
+  scrollbar-width: none;
 }
 
 .home-shelf::-webkit-scrollbar {
-  height: 8px;
+  display: none;
 }
 
-.home-shelf::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+.home-shelf-next {
+  position: absolute;
+  z-index: 2;
+  top: 42%;
+  right: 4px;
+  display: grid;
+  width: 42px;
+  height: 62px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 5px;
+  background: rgba(14, 14, 18, 0.86);
+  color: var(--color-white);
+  cursor: pointer;
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.home-shelf-next:hover,
+.home-shelf-next:focus-visible {
+  border-color: rgba(124, 92, 255, 0.78);
+  background: rgba(27, 24, 40, 0.94);
 }
 
 .home-work-card {
@@ -1666,7 +1711,7 @@ h3 {
 
 .home-work-cover {
   display: flex;
-  min-height: 248px;
+  min-height: 210px;
   aspect-ratio: 2 / 3;
   flex-direction: column;
   align-items: center;
@@ -2391,7 +2436,8 @@ h2 {
   }
 
   .home-shelf {
-    grid-auto-columns: minmax(146px, 42vw);
+    grid-auto-columns: minmax(140px, 42vw);
+    min-height: 268px;
   }
 }
 
@@ -2452,8 +2498,19 @@ h2 {
     align-items: flex-start;
   }
 
+  .home-shelf {
+    min-height: 262px;
+    padding-right: 42px;
+  }
+
+  .home-shelf-next {
+    width: 36px;
+    height: 54px;
+    font-size: 2rem;
+  }
+
   .home-work-cover {
-    min-height: 220px;
+    min-height: 204px;
   }
 
   .record-details {

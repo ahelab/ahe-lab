@@ -578,6 +578,18 @@ function renderHomeShelf(records) {
   return records.map(renderHomeShelfCard).join("");
 }
 
+function bindHomeShelfControls() {
+  document.querySelectorAll(".home-shelf-next").forEach((button) => {
+    button.addEventListener("click", () => {
+      const shelf = document.querySelector(`#${button.dataset.shelfTarget}`);
+
+      if (shelf) {
+        shelf.scrollBy({ left: Math.max(shelf.clientWidth * 0.9, 320), behavior: "smooth" });
+      }
+    });
+  });
+}
+
 function getRecordPerformers(record) {
   return record.performers || record.characters;
 }
@@ -1027,7 +1039,7 @@ function renderCategorizedTags(record) {
 
 // Page renderers.
 function renderHomePreview(records) {
-  const shelfLimit = 12;
+  const shelfLimit = 6;
   const latestShelf = document.querySelector("#home-latest-shelf");
   const highScoreShelf = document.querySelector("#home-high-score-shelf");
   const popularTags = document.querySelector("#home-popular-tags");
@@ -1057,6 +1069,8 @@ function renderHomePreview(records) {
       <a class="tag-button" href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
     `).join("");
   }
+
+  bindHomeShelfControls();
 }
 
 function renderDatabasePage(records) {
