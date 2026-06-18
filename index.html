@@ -3,150 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AHE LAB is an Expression Archive Institute for documenting, classifying, and researching ahegao culture.">
-  <meta property="og:title" content="AHE LAB | Expression Archive Institute">
-  <meta property="og:description" content="AHE LAB is a JSON-driven static database for documenting, classifying, and researching expression archive records.">
+  <meta name="description" content="AHE LAB is a dark archive media site for discovering ahegao expression works by type, score, and tags.">
+  <meta property="og:title" content="AHE LAB | Work Archive">
+  <meta property="og:description" content="Discover works by latest additions, community score, type, and expression tags.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="index.html">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="AHE LAB | Expression Archive Institute">
-  <meta name="twitter:description" content="A JSON-driven expression archive database built for GitHub Pages.">
+  <meta name="twitter:title" content="AHE LAB | Work Archive">
+  <meta name="twitter:description" content="AHE LAB work discovery archive.">
   <link rel="canonical" href="index.html">
-  <title>AHE LAB | Expression Archive Institute</title>
+  <title>AHE LAB | Work Archive</title>
   <link rel="stylesheet" href="assets/css/style.css?v=8">
 </head>
-<body data-page="home">
+<body class="home-page" data-page="home">
   <div id="site-header"></div>
 
-  <main>
-    <section class="hero" id="home" aria-labelledby="hero-title">
-      <div class="hero-content">
-        <p class="eyebrow">Cultural Database</p>
-        <h1 id="hero-title">AHE LAB</h1>
-        <p class="hero-copy">
-          作品、演者、メーカー、タグ、レビューから探せるアヘ顔文化データベース。
-        </p>
-        <div class="hero-actions" aria-label="Main actions">
-          <a class="button primary" href="database.html">Browse Works</a>
-          <a class="button secondary" href="#search">Search</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section-dark" aria-labelledby="home-latest-title">
-      <div class="section-heading">
+  <main class="home-media-page">
+    <section class="home-shelf-section home-shelf-featured" aria-labelledby="home-new-title">
+      <div class="home-shelf-heading">
         <p class="eyebrow">Latest</p>
-        <h2 id="home-latest-title">Latest Works</h2>
-        <p>最近追加された作品を一覧で確認できます。</p>
+        <h1 id="home-new-title">New Works</h1>
+        <a href="database.html">すべて見る</a>
       </div>
-      <div class="record-grid" id="home-latest-grid"></div>
+      <div class="home-shelf" id="home-latest-shelf" aria-label="最新追加作品"></div>
     </section>
 
-    <section class="section" aria-labelledby="home-discovery-title">
-      <div class="section-heading">
-        <p class="eyebrow">Browse</p>
-        <h2 id="home-discovery-title">Find by Tag, Performer, Maker</h2>
-        <p>作品を探すための主要な入口です。</p>
+    <section class="home-shelf-section" aria-labelledby="home-high-score-title">
+      <div class="home-shelf-heading">
+        <h2 id="home-high-score-title">Top Rated</h2>
+        <a href="ranking.html">ランキング</a>
       </div>
-      <div class="home-discovery">
-        <article class="home-panel">
-          <h3>Popular Tags</h3>
-          <div class="tag-cloud" id="home-popular-tags"></div>
-        </article>
-        <article class="home-panel">
-          <h3>Popular Circles</h3>
-          <div class="tag-cloud" id="home-popular-circles"></div>
-        </article>
-        <article class="home-panel">
-          <h3>Popular Performers</h3>
-          <div class="tag-cloud" id="home-popular-performers"></div>
-        </article>
-        <article class="home-panel">
-          <h3>Random Work</h3>
-          <div id="home-random-work"></div>
-        </article>
-        <article class="home-panel home-panel-wide">
-          <h3>Recent Community Reviews</h3>
-          <div id="home-recent-reviews"></div>
-        </article>
-      </div>
+      <div class="home-shelf" id="home-high-score-shelf" aria-label="高評価作品"></div>
     </section>
 
-    <section class="section section-dark" id="search" aria-labelledby="search-title">
-      <div class="section-heading">
-        <p class="eyebrow">Search</p>
-        <h2 id="search-title">Archive Search</h2>
-        <p>作品名、演者、メーカー、タグから検索できます。</p>
+    <section class="home-category-section" aria-labelledby="home-categories-title">
+      <div class="home-shelf-heading">
+        <h2 id="home-categories-title">Categories</h2>
+        <a href="database.html">すべて見る</a>
       </div>
-
-      <form class="search-bar" role="search">
-        <label class="visually-hidden" for="archive-search">Search archive</label>
-        <input id="archive-search" type="search" placeholder="Search by title, medium, tag, note..." autocomplete="off">
-        <button type="reset" id="clear-search">Clear</button>
-      </form>
-    </section>
-
-    <section class="section" id="database" aria-labelledby="database-title">
-      <div class="section-heading">
-        <p class="eyebrow">Database</p>
-        <h2 id="database-title">Expression Records</h2>
-        <p>作品を比較しやすいデータベース型の一覧です。</p>
+      <div class="home-category-block" aria-labelledby="home-anime-title">
+        <h3 id="home-anime-title">アニメ</h3>
+        <div class="home-shelf" id="home-type-anime-shelf" aria-label="アニメ"></div>
       </div>
-
-      <div class="database-toolbar" aria-live="polite">
-        <span id="result-count">0 records</span>
-        <select id="sort-records" aria-label="Sort records">
-          <option value="score">Sort by AHE Score</option>
-          <option value="year">Sort by Year</option>
-          <option value="title">Sort by Title</option>
-        </select>
+      <div class="home-category-block" aria-labelledby="home-manga-title">
+        <h3 id="home-manga-title">マンガ</h3>
+        <div class="home-shelf" id="home-type-manga-shelf" aria-label="マンガ"></div>
       </div>
-
-      <div class="record-grid" id="record-grid"></div>
-      <div class="section-action">
-        <a class="button primary" href="database.html">Open Full Database</a>
+      <div class="home-category-block" aria-labelledby="home-illustration-title">
+        <h3 id="home-illustration-title">イラスト</h3>
+        <div class="home-shelf" id="home-type-illustration-shelf" aria-label="イラスト"></div>
+      </div>
+      <div class="home-category-block" aria-labelledby="home-adult-title">
+        <h3 id="home-adult-title">アダルト</h3>
+        <div class="home-shelf" id="home-type-adult-shelf" aria-label="アダルト"></div>
+      </div>
+      <div class="home-category-block" aria-labelledby="home-sns-title">
+        <h3 id="home-sns-title">SNS</h3>
+        <div class="home-shelf" id="home-type-sns-shelf" aria-label="SNS"></div>
       </div>
     </section>
 
-    <section class="section section-dark" id="tags" aria-labelledby="tags-title">
-      <div class="section-heading">
-        <p class="eyebrow">Tags</p>
-        <h2 id="tags-title">Classification Tags</h2>
-        <p>代表的なタグから作品へ移動できます。</p>
+    <section class="home-shelf-section home-tag-section" aria-labelledby="home-tags-title">
+      <div class="home-shelf-heading">
+        <h2 id="home-tags-title">人気タグ</h2>
+        <a href="tag.html">タグ一覧</a>
       </div>
-
-      <div class="tag-cloud" id="tag-cloud" aria-label="Filter by tag"></div>
-    </section>
-
-    <section class="section about-section" id="about" aria-labelledby="about-title">
-      <div class="section-heading">
-        <p class="eyebrow">About</p>
-        <h2 id="about-title">Expression Archive Institute</h2>
-      </div>
-
-      <div class="about-grid">
-        <article>
-          <h3>Mission</h3>
-          <p>
-            AHE LABは、アヘ顔という表現を一つの文化資料として記録し、
-            分類可能なデータベースとして未来に残すことを目的とします。
-          </p>
-          <a class="text-link" href="about.html">Open About</a>
-        </article>
-        <article>
-          <h3>Method</h3>
-          <p>
-            作品、媒体、タグ、表現要素、研究メモを分けて管理し、
-            参照しやすく更新しやすいアーカイブを目指します。
-          </p>
-        </article>
-        <article>
-          <h3>Principle</h3>
-          <p>
-            Archive First. 露骨な素材ではなく、表現分類と文化的文脈の記録を優先します。
-          </p>
-        </article>
-      </div>
+      <div class="tag-cloud home-tag-cloud" id="home-popular-tags"></div>
     </section>
   </main>
 
