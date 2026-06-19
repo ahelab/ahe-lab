@@ -488,12 +488,32 @@ function formatWorkCount(count) {
   return `${count} work${count === 1 ? "" : "s"}`;
 }
 
-function renderRecordCard(record, variant = "database") {
-  const thumbnail = record.thumbnail || {
-    label: record.id,
+function getThumbnailData(record) {
+  const thumbnail = record?.thumbnail || {
+    label: record?.id || "AHE LAB",
     accent: "#7C5CFF",
     background: "#111115"
   };
+  const url = typeof thumbnail === "string"
+    ? thumbnail
+    : thumbnail.url || thumbnail.src || thumbnail.image || "";
+  const accent = typeof thumbnail === "object" ? thumbnail.accent || "#7C5CFF" : "#7C5CFF";
+  const background = typeof thumbnail === "object" ? thumbnail.background || "#111115" : "#111115";
+  const style = `--thumb-accent:${escapeHtml(accent)}; --thumb-bg:${escapeHtml(background)};`;
+
+  return { url, style };
+}
+
+function renderThumbnailImage(record, className = "") {
+  const thumbnail = getThumbnailData(record);
+
+  return thumbnail.url
+    ? `<img class="${className}" src="${escapeHtml(thumbnail.url)}" alt="${escapeHtml(record.title)} package image" loading="lazy">`
+    : "";
+}
+
+function renderRecordCard(record, variant = "database") {
+  const thumbnail = getThumbnailData(record);
   const performers = getRecordPerformers(record);
   const maker = getRecordMaker(record);
   const productId = record.metadata?.productId || record.productId || record.id;
@@ -512,9 +532,10 @@ function renderRecordCard(record, variant = "database") {
 
   return `
     <article class="record-card ${variant === "database" ? "database-card" : ""}">
-      <a class="record-poster record-link" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
+      <a class="record-poster record-link${thumbnail.url ? " has-image" : ""}" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}" style="${thumbnail.style}">
+        ${renderThumbnailImage(record, "record-poster-image")}
         <span class="record-code">${escapeHtml(productId)}</span>
-        <span class="record-thumb-title">Package Image</span>
+        ${thumbnail.url ? "" : `<span class="record-thumb-title">Package Image</span>`}
         <span class="record-score" aria-label="Community Score ${communityScore === null ? "not rated" : escapeHtml(communityScore)}">${communityScore === null ? "NR" : escapeHtml(communityScore)}</span>
       </a>
       <div class="record-body">
@@ -544,24 +565,14 @@ function renderRecordGrid(records) {
 }
 
 function renderHomeShelfCard(record) {
-  const thumbnail = record.thumbnail || {
-    label: record.id,
-    accent: "#7C5CFF",
-    background: "#111115"
-  };
-  const thumbnailUrl = typeof thumbnail === "string"
-    ? thumbnail
-    : thumbnail.url || thumbnail.src || thumbnail.image || "";
+  const thumbnail = getThumbnailData(record);
   const communityScore = getRecordCommunityScore(record);
-  const coverStyle = typeof thumbnail === "object"
-    ? `--thumb-accent:${escapeHtml(thumbnail.accent || "#7C5CFF")}; --thumb-bg:${escapeHtml(thumbnail.background || "#111115")};`
-    : "--thumb-accent:#7C5CFF; --thumb-bg:#111115;";
 
   return `
     <a class="home-work-card" href="work.html?id=${encodeParam(record.id)}" aria-label="Open ${escapeHtml(record.title)}">
-      <span class="home-work-cover${thumbnailUrl ? " has-image" : ""}" style="${coverStyle}">
-        ${thumbnailUrl
-          ? `<img src="${escapeHtml(thumbnailUrl)}" alt="${escapeHtml(record.title)} package image" loading="lazy">`
+      <span class="home-work-cover${thumbnail.url ? " has-image" : ""}" style="${thumbnail.style}">
+        ${thumbnail.url
+          ? renderThumbnailImage(record)
           : `<strong>Package Image</strong>`}
       </span>
       <span class="home-work-title">${escapeHtml(record.title)}</span>
@@ -571,19 +582,7 @@ function renderHomeShelfCard(record) {
 }
 
 function getHomeThumbnail(record) {
-  const thumbnail = record.thumbnail || {
-    label: record.id,
-    accent: "#7C5CFF",
-    background: "#111115"
-  };
-  const url = typeof thumbnail === "string"
-    ? thumbnail
-    : thumbnail.url || thumbnail.src || thumbnail.image || "";
-  const style = typeof thumbnail === "object"
-    ? `--thumb-accent:${escapeHtml(thumbnail.accent || "#7C5CFF")}; --thumb-bg:${escapeHtml(thumbnail.background || "#111115")};`
-    : "--thumb-accent:#7C5CFF; --thumb-bg:#111115;";
-
-  return { url, style };
+  return getThumbnailData(record);
 }
 
 function renderHomeFeatureCard(record, position) {
@@ -1375,11 +1374,7 @@ function renderWorkPage(records) {
   const productId = metadata.productId || "Unrecorded";
   const communityReviews = record ? getCommunityReviews(record) : [];
   const communityScore = getCommunityScore(communityReviews);
-  const thumbnail = record?.thumbnail || {
-    label: record?.id || "AHE LAB",
-    accent: "#7C5CFF",
-    background: "#111115"
-  };
+  const thumbnail = getThumbnailData(record);
 
   if (!record) {
     setMeta("Work Not Found | AHE LAB", "The requested AHE LAB work record was not found.");
@@ -1415,9 +1410,10 @@ function renderWorkPage(records) {
       ${renderBackButton("database.html", "Back to Database")}
       ${renderBreadcrumb([{ label: "Database", href: "database.html" }, { label: record.title }])}
       <header class="work-overview" aria-labelledby="work-title">
-        <div class="work-cover-placeholder" style="--thumb-accent:${escapeHtml(thumbnail.accent)}; --thumb-bg:${escapeHtml(thumbnail.background)};">
+        <div class="work-cover-placeholder${thumbnail.url ? " has-image" : ""}" style="${thumbnail.style}">
+          ${renderThumbnailImage(record, "work-cover-image")}
           <span>${escapeHtml(productId)}</span>
-          <small>Package Image</small>
+          ${thumbnail.url ? "" : `<small>Package Image</small>`}
         </div>
         <div class="work-overview-body">
           <p class="eyebrow">Work</p>

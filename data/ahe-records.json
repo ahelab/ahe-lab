@@ -983,11 +983,12 @@
         "helpfulCount": 0
       }
     ],
-    "thumbnail": {
-      "label": "#0022",
-      "accent": "#7C5CFF",
-      "background": "#111115"
-    },
+  "thumbnail": {
+    "label": "#0022",
+    "url": "assets/images/covers/gvh834.jpg",
+    "accent": "#7C5CFF",
+    "background": "#111115"
+  },
     "cultures": [
       "culture-av-performance"
     ],
