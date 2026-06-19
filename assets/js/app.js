@@ -637,7 +637,8 @@ function getHomeCharacters(records, limit = 6) {
       const current = characterMap.get(characterId) || {
         id: characterId,
         name: formatCharacterName(characterId),
-        count: 0
+        count: 0,
+        image: characterId === "character-fua-kotone" ? "assets/images/characters/toa_kotone.jpg" : ""
       };
 
       if (characterId === "character-fua-kotone" && performers[0]) {
@@ -657,7 +658,11 @@ function getHomeCharacters(records, limit = 6) {
 function renderHomeCharacterCard(character) {
   return `
     <a class="home-character-card" href="character.html?name=${encodeParam(character.id)}" aria-label="Open ${escapeHtml(character.name)}">
-      <span class="home-character-avatar">${escapeHtml(character.name.charAt(0) || "A")}</span>
+      <span class="home-character-avatar${character.image ? " has-image" : ""}">
+        ${character.image
+          ? `<img src="${escapeHtml(character.image)}" alt="${escapeHtml(character.name)} portrait" loading="lazy">`
+          : escapeHtml(character.name.charAt(0) || "A")}
+      </span>
       <strong>${escapeHtml(character.name)}</strong>
       <span>${escapeHtml(character.count)} works</span>
     </a>
