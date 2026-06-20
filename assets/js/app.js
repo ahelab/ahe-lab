@@ -249,6 +249,13 @@ function getAllCharacters(records) {
   return [...new Set(records.flatMap((record) => record.characters))].sort();
 }
 
+function getCharacterLabels(record) {
+  return [...new Set([
+    ...(record.characters || []),
+    ...getRecordPerformers(record)
+  ])];
+}
+
 function getPopularTags(records, limit = 8) {
   return getPopularValues(records.flatMap((record) => getVisibleTags(record.tags)), limit);
 }
@@ -637,12 +644,14 @@ function getHomeCharacters(records, limit = 6) {
       const current = characterMap.get(characterId) || {
         id: characterId,
         name: formatCharacterName(characterId),
+        queryName: characterId,
         count: 0,
         image: characterId === "character-fua-kotone" ? "assets/images/characters/toa_kotone.jpg" : ""
       };
 
       if (characterId === "character-fua-kotone" && performers[0]) {
         current.name = performers[0];
+        current.queryName = performers[0];
       }
 
       current.count += 1;
@@ -656,8 +665,10 @@ function getHomeCharacters(records, limit = 6) {
 }
 
 function renderHomeCharacterCard(character) {
+  const queryName = character.queryName || character.name || character.id;
+
   return `
-    <a class="home-character-card" href="character.html?name=${encodeParam(character.id)}" aria-label="Open ${escapeHtml(character.name)}">
+    <a class="home-character-card" href="character.html?name=${encodeParam(queryName)}" aria-label="Open ${escapeHtml(character.name)}">
       <span class="home-character-avatar${character.image ? " has-image" : ""}">
         ${character.image
           ? `<img src="${escapeHtml(character.image)}" alt="${escapeHtml(character.name)} portrait" loading="lazy">`
@@ -1488,7 +1499,7 @@ function renderListingPage(records, type) {
       return record.circle === displayName;
     }
 
-    return getRecordPerformers(record).includes(displayName);
+    return getCharacterLabels(record).includes(displayName);
   });
 
   setMeta(
