@@ -814,6 +814,54 @@ function renderRelatedWorksSection(relatedRecords) {
   `;
 }
 
+function getWorkPhotos(record) {
+  const photos = Array.isArray(record?.photos)
+    ? record.photos
+    : Array.isArray(record?.media?.photos)
+      ? record.media.photos
+      : [];
+
+  return photos.map((photo, index) => {
+    if (typeof photo === "string") {
+      return {
+        url: photo,
+        caption: `Photo ${index + 1}`
+      };
+    }
+
+    return {
+      url: photo?.url || photo?.src || photo?.image || "",
+      caption: photo?.caption || photo?.label || `Photo ${index + 1}`,
+      note: photo?.note || ""
+    };
+  }).filter((photo) => photo.url);
+}
+
+function renderWorkPhotosSection(record) {
+  const photos = getWorkPhotos(record);
+
+  if (photos.length === 0) {
+    return "";
+  }
+
+  return `
+    <section class="detail-section work-photos-section" aria-labelledby="work-photos-title">
+      <div class="work-section-header">
+        <h2 id="work-photos-title">Photos <span>${escapeHtml(photos.length)}</span></h2>
+      </div>
+      <div class="work-photo-grid">
+        ${photos.map((photo) => `
+          <a class="work-photo-card" href="${escapeHtml(photo.url)}" target="_blank" rel="noopener">
+            <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(`${record.title} - ${photo.caption}`)}" loading="lazy">
+            <span>${escapeHtml(photo.caption)}</span>
+            ${photo.note ? `<small>${escapeHtml(photo.note)}</small>` : ""}
+          </a>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderExternalLinks(record) {
   const links = Array.isArray(record.externalLinks) ? record.externalLinks : [];
   const placeholderLinks = ["FANZA", "DMM", "Official"];
@@ -1456,6 +1504,7 @@ function renderWorkPage(records) {
         <p>${escapeHtml(archiveNote)}</p>
       </section>
 
+      ${renderWorkPhotosSection(record)}
       ${renderCommunityReviews(record)}
       ${renderRelatedWorksSection(relatedRecords)}
     </article>

@@ -983,12 +983,12 @@
         "helpfulCount": 0
       }
     ],
-  "thumbnail": {
-    "label": "#0022",
-    "url": "assets/images/covers/gvh834.jpg",
-    "accent": "#7C5CFF",
-    "background": "#111115"
-  },
+    "thumbnail": {
+      "label": "#0022",
+      "url": "assets/images/covers/gvh834.jpg",
+      "accent": "#7C5CFF",
+      "background": "#111115"
+    },
     "cultures": [
       "culture-av-performance"
     ],
@@ -996,6 +996,12 @@
       "event-ahegao-archive-institutionalization",
       "event-ahegao-av-performance-adoption",
       "event-ahegao-double-peace-codification"
+    ],
+    "photos": [
+      {
+        "url": "assets/images/photos/gvh834/photo-01.jpg",
+        "caption": "GVH-834 scene cut 01"
+      }
     ]
   }
 ]
