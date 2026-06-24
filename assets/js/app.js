@@ -393,7 +393,15 @@ function renderLayout(activePage) {
   const footer = document.querySelector("#site-footer");
 
   if (header) {
-    header.innerHTML = `
+    header.innerHTML = activePage === "home" ? `
+      <header class="cinema-header">
+        <a class="cinema-brand" href="index.html" aria-label="AHE LAB home">AHE LAB</a>
+        <nav aria-label="Primary navigation">
+          <a class="cinema-outline-button" href="database.html">[ OPEN ARCHIVE ]</a>
+          <a class="cinema-signin-button" href="about.html">ABOUT</a>
+        </nav>
+      </header>
+    ` : `
       <header class="site-header">
         <a class="brand" href="index.html" aria-label="AHE LAB home">
           <span class="brand-mark">A</span>
@@ -417,7 +425,19 @@ function renderLayout(activePage) {
   }
 
   if (footer) {
-    footer.innerHTML = `
+    footer.innerHTML = activePage === "home" ? `
+      <footer class="cinema-footer">
+        <div>
+          <strong>AHE LAB GLOBAL ARCHIVE</strong>
+          <p>© 2026 AHE LAB SYSTEM. ALL RIGHTS RESERVED.</p>
+        </div>
+        <nav aria-label="Footer navigation">
+          <a href="about.html">FAQ</a>
+          <a href="sitemap.html">SITEMAP</a>
+          <a href="database.html">DATABASE</a>
+        </nav>
+      </footer>
+    ` : `
       <footer class="site-footer">
         <p>© 2026 AHE LAB. Expression Archive Institute.</p>
         <div>
@@ -1207,48 +1227,126 @@ function renderCategorizedTags(record) {
 
 // Page renderers.
 function renderHomePreview(records) {
-  const shelfLimit = 6;
-  const featureStrip = document.querySelector("#home-feature-strip");
-  const characterShelf = document.querySelector("#home-character-shelf");
-  const latestShelf = document.querySelector("#home-latest-shelf");
-  const highScoreShelf = document.querySelector("#home-high-score-shelf");
-  const popularTags = document.querySelector("#home-popular-tags");
-  const typeShelfMap = {
-    "アニメ": document.querySelector("#home-type-anime-shelf"),
-    "マンガ": document.querySelector("#home-type-manga-shelf"),
-    "イラスト": document.querySelector("#home-type-illustration-shelf"),
-    "アダルト": document.querySelector("#home-type-adult-shelf"),
-    "SNS": document.querySelector("#home-type-sns-shelf")
-  };
+  const rankingGrid = document.querySelector("#cinema-ranking-grid");
+  const recentGrid = document.querySelector("#cinema-recent-grid");
+  const timelineGrid = document.querySelector("#cinema-timeline-grid");
+  const filterSubmit = document.querySelector("#cinema-filter-submit");
+  const filterReset = document.querySelector("#cinema-filter-reset");
+  const filterButtons = [...document.querySelectorAll("[data-home-tag]")];
 
-  if (!latestShelf || !highScoreShelf) {
+  if (!rankingGrid || !recentGrid || !timelineGrid || !filterSubmit || !filterReset) {
     return;
   }
 
-  if (featureStrip) {
-    featureStrip.innerHTML = renderHomeFeatureStrip(records);
-  }
+  const rankedWithPeople = sortByCommunityScore(records)
+    .filter((record) => getCharacterLabels(record).length > 0)
+    .slice(0, 4);
+  const rankingRecords = rankedWithPeople.length >= 4
+    ? rankedWithPeople
+    : sortRecords(records, "score").slice(0, 4);
 
-  if (characterShelf) {
-    characterShelf.innerHTML = renderHomeCharacterShelf(records);
-  }
+  rankingGrid.innerHTML = rankingRecords.map((record, index) => {
+    const thumbnail = getThumbnailData(record);
+    const score = getRecordCommunityScore(record) ?? record.score;
+    const character = getCharacterLabels(record)[0] || getRecordMaker(record);
 
-  latestShelf.innerHTML = renderHomeShelf(sortRecords(records, "newest").slice(0, shelfLimit));
-  highScoreShelf.innerHTML = renderHomeShelf(sortByCommunityScore(records).slice(0, shelfLimit));
+    return `
+      <a class="cinema-ranking-card" href="work.html?id=${encodeParam(record.id)}" style="${thumbnail.style}">
+        ${thumbnail.url ? renderThumbnailImage(record, "cinema-ranking-image") : ""}
+        <span class="cinema-ranking-shade"></span>
+        <span class="cinema-rank-number">${index + 1}</span>
+        <span class="cinema-ranking-copy">
+          <small>${index === 0 ? "QUEEN OF THE ARCHIVE" : "VERIFIED RECORD"}</small>
+          <strong>${escapeHtml(character)}</strong>
+          <span>${escapeHtml(record.id)} <b>★ ${escapeHtml(score)}</b></span>
+        </span>
+      </a>
+    `;
+  }).join("");
 
-  Object.entries(typeShelfMap).forEach(([type, shelf]) => {
-    if (shelf) {
-      shelf.innerHTML = renderHomeShelf(sortRecords(records.filter((record) => getRecordType(record) === type), "newest").slice(0, shelfLimit));
+  recentGrid.innerHTML = sortRecords(records, "newest").slice(0, 3).map((record) => {
+    const thumbnail = getThumbnailData(record);
+    const score = getRecordCommunityScore(record) ?? record.score;
+    const performer = getCharacterLabels(record)[0] || "UNRECORDED";
+
+    return `
+      <a class="cinema-recent-card" href="work.html?id=${encodeParam(record.id)}">
+        <span class="cinema-recent-cover" style="${thumbnail.style}">
+          ${thumbnail.url ? renderThumbnailImage(record, "cinema-recent-image") : '<span class="cinema-film-mark">🎬</span>'}
+          <small>${escapeHtml(getRecordRelease(record))}</small>
+        </span>
+        <span class="cinema-recent-meta"><span>${escapeHtml(getRecordMaker(record))}</span><b>// ${escapeHtml(getVisibleTags(record.tags)[0] || getRecordType(record))}</b></span>
+        <strong>${escapeHtml(record.title)}</strong>
+        <span class="cinema-recent-bottom"><span>CAST: ${escapeHtml(performer)}</span><b>★ ${escapeHtml(score)}</b></span>
+      </a>
+    `;
+  }).join("");
+
+  const reviewItems = records.flatMap((record) =>
+    getCommunityReviews(record).map((review) => ({ record, review }))
+  ).slice(-3).reverse();
+  const timelineItems = reviewItems.length ? reviewItems : sortRecords(records, "newest").slice(0, 3).map((record) => ({
+    record,
+    review: {
+      author: getCharacterLabels(record)[0] || "AHE LAB",
+      comment: getRecordArchiveNote(record),
+      score: getRecordCommunityScore(record) ?? record.score
     }
+  }));
+
+  timelineGrid.innerHTML = timelineItems.map(({ record, review }) => `
+    <a class="cinema-timeline-card" href="work.html?id=${encodeParam(record.id)}">
+      <span class="cinema-timeline-top">
+        <strong>${escapeHtml(review.nickname || review.author || review.reviewer || "ARCHIVIST")}</strong>
+        <small>VERIFIED</small>
+      </span>
+      <p>${escapeHtml(review.comment || review.note || getRecordArchiveNote(record))}</p>
+      <span class="cinema-timeline-bottom">
+        <b>AHE SCORE ${escapeHtml(getReviewScore(review) ?? review.score ?? getRecordCommunityScore(record) ?? record.score)}</b>
+        <small>${escapeHtml(record.id)}</small>
+      </span>
+    </a>
+  `).join("");
+
+  let selectedTags = [];
+
+  function updateHomeFilter() {
+    filterButtons.forEach((button) => {
+      button.classList.toggle("is-selected", selectedTags.includes(button.dataset.homeTag));
+    });
+
+    if (selectedTags.length === 0) {
+      filterSubmit.textContent = "属性条件を選択してください";
+      filterSubmit.href = "database.html";
+      filterSubmit.classList.add("is-disabled");
+      filterReset.hidden = true;
+      return;
+    }
+
+    const params = new URLSearchParams();
+    selectedTags.forEach((tag) => params.append("tag", tag));
+    filterSubmit.textContent = `選択した ${selectedTags.length} 件の属性で検索を開始 →`;
+    filterSubmit.href = `database.html?${params.toString()}`;
+    filterSubmit.classList.remove("is-disabled");
+    filterReset.hidden = false;
+  }
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const tag = button.dataset.homeTag;
+      selectedTags = selectedTags.includes(tag)
+        ? selectedTags.filter((selectedTag) => selectedTag !== tag)
+        : [...selectedTags, tag];
+      updateHomeFilter();
+    });
   });
 
-  if (popularTags) {
-    popularTags.innerHTML = HOME_POPULAR_TAGS.map((tag) => `
-      <a class="tag-button" href="tag.html?name=${encodeParam(tag)}">${escapeHtml(tag)}</a>
-    `).join("");
-  }
+  filterReset.addEventListener("click", () => {
+    selectedTags = [];
+    updateHomeFilter();
+  });
 
-  bindHomeShelfControls();
+  updateHomeFilter();
 }
 
 function renderDatabasePage(records) {
@@ -1317,6 +1415,7 @@ function renderDatabasePage(records) {
   `;
 
   databaseState.records = records;
+  databaseState.selectedTags = new URLSearchParams(window.location.search).getAll("tag");
 
   const grid = document.querySelector("#db-record-grid");
   const searchInput = document.querySelector("#db-search");

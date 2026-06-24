@@ -3,129 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AHE LAB is a dark archive media site for discovering ahegao expression works by type, score, and tags.">
-  <meta property="og:title" content="AHE LAB | Work Archive">
-  <meta property="og:description" content="Discover works by latest additions, community score, type, and expression tags.">
+  <meta name="description" content="AHE LAB — 映像・作品内の表情表現を記録、分類、検索するデジタルアーカイブ。">
+  <meta property="og:title" content="AHE LAB | Expression Archive">
+  <meta property="og:description" content="表情表現の瞬間を記録・解析するデジタルアーカイブ。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="index.html">
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="AHE LAB | Work Archive">
-  <meta name="twitter:description" content="AHE LAB work discovery archive.">
+  <meta name="twitter:title" content="AHE LAB | Expression Archive">
+  <meta name="twitter:description" content="表情表現の瞬間を記録・解析するデジタルアーカイブ。">
   <link rel="canonical" href="index.html">
-  <title>AHE LAB | Work Archive</title>
-  <link rel="stylesheet" href="assets/css/style.css?v=13">
+  <title>AHE LAB | Expression Archive</title>
+  <link rel="stylesheet" href="assets/css/style.css?v=14">
 </head>
-<body class="home-page" data-page="home">
+<body class="home-page cinema-home" data-page="home">
   <div id="site-header"></div>
 
-  <main class="home-media-page">
-    <section class="home-feature-strip" aria-label="Featured works">
-      <div class="home-feature-grid" id="home-feature-strip"></div>
-    </section>
-
-    <section class="home-shelf-section home-character-section" aria-labelledby="home-character-title">
-      <div class="home-shelf-heading">
-        <p class="eyebrow">People</p>
-        <h2 id="home-character-title">出演者 / Characters</h2>
-        <a href="character.html">すべて見る</a>
-      </div>
-      <div class="home-shelf-frame">
-        <div class="home-character-shelf" id="home-character-shelf" aria-label="出演者とキャラクター"></div>
-        <button class="home-shelf-next" type="button" data-shelf-target="home-character-shelf" aria-label="出演者を横に送る">›</button>
-      </div>
-    </section>
-
-    <section class="home-shelf-section home-shelf-featured" aria-labelledby="home-new-title">
-      <div class="home-shelf-heading">
-        <p class="eyebrow">Latest</p>
-        <h1 id="home-new-title">New Works</h1>
-        <a href="database.html">すべて見る</a>
-      </div>
-      <div class="home-shelf-frame">
-        <div class="home-shelf" id="home-latest-shelf" aria-label="最新追加作品"></div>
-        <button class="home-shelf-next" type="button" data-shelf-target="home-latest-shelf" aria-label="New Worksを横に送る">›</button>
-      </div>
-    </section>
-
-    <section class="home-shelf-section" aria-labelledby="home-high-score-title">
-      <div class="home-shelf-heading">
-        <h2 id="home-high-score-title">Top Rated</h2>
-        <a href="ranking.html">ランキング</a>
-      </div>
-      <div class="home-shelf-frame">
-        <div class="home-shelf" id="home-high-score-shelf" aria-label="高評価作品"></div>
-        <button class="home-shelf-next" type="button" data-shelf-target="home-high-score-shelf" aria-label="Top Ratedを横に送る">›</button>
-      </div>
-    </section>
-
-    <section class="home-category-section" aria-labelledby="home-categories-title">
-      <div class="home-shelf-heading">
-        <h2 id="home-categories-title">Categories</h2>
-        <a href="database.html">すべて見る</a>
-      </div>
-      <div class="home-category-block" aria-labelledby="home-anime-title">
-        <div class="home-category-heading">
-          <h3 id="home-anime-title">アニメ</h3>
-          <a href="database.html?type=%E3%82%A2%E3%83%8B%E3%83%A1">すべて見る</a>
-        </div>
-        <div class="home-shelf-frame">
-          <div class="home-shelf" id="home-type-anime-shelf" aria-label="アニメ"></div>
-          <button class="home-shelf-next" type="button" data-shelf-target="home-type-anime-shelf" aria-label="アニメを横に送る">›</button>
-        </div>
-      </div>
-      <div class="home-category-block" aria-labelledby="home-manga-title">
-        <div class="home-category-heading">
-          <h3 id="home-manga-title">マンガ</h3>
-          <a href="database.html?type=%E3%83%9E%E3%83%B3%E3%82%AC">すべて見る</a>
-        </div>
-        <div class="home-shelf-frame">
-          <div class="home-shelf" id="home-type-manga-shelf" aria-label="マンガ"></div>
-          <button class="home-shelf-next" type="button" data-shelf-target="home-type-manga-shelf" aria-label="マンガを横に送る">›</button>
-        </div>
-      </div>
-      <div class="home-category-block" aria-labelledby="home-illustration-title">
-        <div class="home-category-heading">
-          <h3 id="home-illustration-title">イラスト</h3>
-          <a href="database.html?type=%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88">すべて見る</a>
-        </div>
-        <div class="home-shelf-frame">
-          <div class="home-shelf" id="home-type-illustration-shelf" aria-label="イラスト"></div>
-          <button class="home-shelf-next" type="button" data-shelf-target="home-type-illustration-shelf" aria-label="イラストを横に送る">›</button>
-        </div>
-      </div>
-      <div class="home-category-block" aria-labelledby="home-adult-title">
-        <div class="home-category-heading">
-          <h3 id="home-adult-title">アダルト</h3>
-          <a href="database.html?type=%E3%82%A2%E3%83%80%E3%83%AB%E3%83%88">すべて見る</a>
-        </div>
-        <div class="home-shelf-frame">
-          <div class="home-shelf" id="home-type-adult-shelf" aria-label="アダルト"></div>
-          <button class="home-shelf-next" type="button" data-shelf-target="home-type-adult-shelf" aria-label="アダルトを横に送る">›</button>
-        </div>
-      </div>
-      <div class="home-category-block" aria-labelledby="home-sns-title">
-        <div class="home-category-heading">
-          <h3 id="home-sns-title">SNS</h3>
-          <a href="database.html?type=SNS">すべて見る</a>
-        </div>
-        <div class="home-shelf-frame">
-          <div class="home-shelf" id="home-type-sns-shelf" aria-label="SNS"></div>
-          <button class="home-shelf-next" type="button" data-shelf-target="home-type-sns-shelf" aria-label="SNSを横に送る">›</button>
+  <main>
+    <section class="cinema-hero" aria-labelledby="cinema-hero-title">
+      <div class="cinema-hero-shade"></div>
+      <div class="cinema-hero-glow"></div>
+      <div class="cinema-hero-content">
+        <p class="cinema-kicker">● PUBLIC VERIFIED ARCHIVES INDEX</p>
+        <h1 id="cinema-hero-title">THE INFINITE DIGITAL SHELF OF ECSTASY.</h1>
+        <p class="cinema-hero-copy">
+          映像・作品内の快感、恍惚、服従が交錯する瞬間を正確に記録。
+          暗闇の中で、アーカイブの核心データを探索できます。
+        </p>
+        <div class="cinema-actions">
+          <a class="cinema-primary-button" href="database.html">EXPLORE THE ARCHIVE <span>→</span></a>
         </div>
       </div>
     </section>
 
-    <section class="home-shelf-section home-tag-section" aria-labelledby="home-tags-title">
-      <div class="home-shelf-heading">
-        <h2 id="home-tags-title">人気タグ</h2>
-        <a href="tag.html">タグ一覧</a>
-      </div>
-      <div class="tag-cloud home-tag-cloud" id="home-popular-tags"></div>
-    </section>
+    <div class="cinema-container">
+      <section class="cinema-section" aria-labelledby="trending-title">
+        <div class="cinema-section-heading cinema-heading-rule">
+          <h2 id="trending-title">Trending Archive Queens</h2>
+          <span>VOL. 26</span>
+        </div>
+        <div class="cinema-ranking-grid" id="cinema-ranking-grid"></div>
+      </section>
+
+      <section class="cinema-filter-panel" aria-labelledby="filter-title">
+        <div>
+          <h2 id="filter-title">こだわり条件から探す</h2>
+          <p>複数の表情・状態タグを選択して、アーカイブを絞り込みます。</p>
+        </div>
+        <div class="cinema-filter-groups">
+          <div class="cinema-filter-row">
+            <strong>身体・表情現象系</strong>
+            <div>
+              <button type="button" data-home-tag="アヘ顔">#アヘ顔</button>
+              <button type="button" data-home-tag="白目">#白目</button>
+              <button type="button" data-home-tag="寄り目">#寄り目</button>
+              <button type="button" data-home-tag="舌出し">#舌出し</button>
+              <button type="button" data-home-tag="よだれ">#よだれ</button>
+              <button type="button" data-home-tag="ダブルピース">#ダブルピース</button>
+              <button type="button" data-home-tag="涙">#涙</button>
+              <button type="button" data-home-tag="汗">#汗</button>
+              <button type="button" data-home-tag="火照り">#火照り</button>
+            </div>
+          </div>
+          <div class="cinema-filter-row">
+            <strong>シチュエーション・要因系</strong>
+            <div>
+              <button type="button" data-home-tag="催眠">#催眠</button>
+              <button type="button" data-home-tag="ドラッグ">#ドラッグ</button>
+              <button type="button" data-home-tag="キメセク">#キメセク</button>
+              <button type="button" data-home-tag="ぴえん">#ぴえん</button>
+            </div>
+          </div>
+          <div class="cinema-filter-row">
+            <strong>心理・精神状態系</strong>
+            <div>
+              <button type="button" data-home-tag="快楽">#快楽</button>
+              <button type="button" data-home-tag="恍惚">#恍惚</button>
+              <button type="button" data-home-tag="愉悦">#愉悦</button>
+              <button type="button" data-home-tag="忠誠">#忠誠</button>
+              <button type="button" data-home-tag="抵抗">#抵抗</button>
+              <button type="button" data-home-tag="服従">#服従</button>
+              <button type="button" data-home-tag="絶望">#絶望</button>
+            </div>
+          </div>
+        </div>
+        <div class="cinema-filter-actions">
+          <a id="cinema-filter-submit" class="cinema-filter-submit is-disabled" href="database.html">属性条件を選択してください</a>
+          <button id="cinema-filter-reset" class="cinema-filter-reset" type="button" hidden>選択をすべてリセット</button>
+        </div>
+      </section>
+
+      <section class="cinema-section" aria-labelledby="recent-title">
+        <div class="cinema-section-heading">
+          <h2 id="recent-title">Recent Verified Archives</h2>
+          <a href="database.html">SEE ALL</a>
+        </div>
+        <div class="cinema-recent-grid" id="cinema-recent-grid"></div>
+      </section>
+
+      <section class="cinema-section" aria-labelledby="timeline-title">
+        <div class="cinema-section-heading">
+          <h2 id="timeline-title">Live Review Timeline</h2>
+          <a href="ranking.html">RANKING</a>
+        </div>
+        <div class="cinema-timeline-grid" id="cinema-timeline-grid"></div>
+      </section>
+
+      <section class="cinema-faq" aria-labelledby="faq-title">
+        <h2 id="faq-title">Frequently Asked Questions</h2>
+        <div class="cinema-faq-list">
+          <details>
+            <summary>AHE LABとは何ですか？<span>＋</span></summary>
+            <p>作品内における特定の表情や精神状態を記録・分類し、検索できるデジタルアーカイブです。</p>
+          </details>
+          <details>
+            <summary>複数の条件を組み合わせて検索できますか？<span>＋</span></summary>
+            <p>表情、身体反応、精神状態などから複数のタグを選び、該当する作品を絞り込めます。</p>
+          </details>
+          <details>
+            <summary>VERIFIEDとは何ですか？<span>＋</span></summary>
+            <p>記録内容や分類情報について、アーカイブ上で確認済みであることを示すラベルです。</p>
+          </details>
+          <details>
+            <summary>スマートフォンでも閲覧できますか？<span>＋</span></summary>
+            <p>はい。スマートフォン、タブレット、デスクトップの各画面に対応しています。</p>
+          </details>
+        </div>
+        <div class="cinema-final-cta">
+          <p>Ready to explore? Enter the archive and find your next record.</p>
+          <a class="cinema-primary-button" href="database.html">GET STARTED <span>›</span></a>
+        </div>
+      </section>
+    </div>
   </main>
 
   <div id="site-footer"></div>
-
-  <script src="assets/js/app.js?v=12"></script>
+  <script src="assets/js/app.js?v=13"></script>
 </body>
 </html>
